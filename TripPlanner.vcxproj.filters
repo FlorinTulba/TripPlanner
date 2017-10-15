@@ -29,5 +29,8 @@
     <ClInclude Include="pricing.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="pricingBase.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -24,31 +24,19 @@
 
 #pragma once
 
-#include "pricingBase.h"
-
 /**
-Realizes ITicketPriceCalculator.
+Simulating the computation of ticket prices.
 
-The normal fare might be computed like: ln(1 + k * tripDistance),
-where k is an adjustable constant, set / updated by the transportation provider.
-There are 2 different k constants for economy / business class seats.
-
-For airplane tickets, it uses low and high fare factors,
-to provide boundaries for the ticket price. A formula might be:
-normalFare * (lowFareFactor + (highFareFactor - lowFareFactor) *
-(e^max(urgency, occupancy) - 1) / (e - 1))
+Behavior:
+- to ensure a profit, small distances are more expensive per km
+than long travel distances
+- if there is a business class, it's supposed to be
+more expensive than the economy class
+- airplane tickets use high fares for urgent bookings,
+or when the airplane is almost fully booked
 */
-class TicketPriceCalculator : public ITicketPriceCalculator {
-protected:
-	float kEconomy;			///< k for economy class
-	float kBusiness;		///< k for business class
-	float lowFareFactor;	///< fare reduction factor (range [0,1])
-	float highFareFactor;	///< fare increase factor (at least 1)
-
-public:
-	/// Throws invalid_argument for invalid k or factors
-	TicketPriceCalculator(float kEconomy_, float kBusiness_ = 0.f,
-						  float lowFareFactor_ = 1.f, float highFareFactor_ = 1.f);
+struct ITicketPriceCalculator abstract {
+	virtual ~ITicketPriceCalculator() = 0 {}
 
 	/**
 	The basic fare, based only on distance and seat class.
@@ -57,7 +45,7 @@ public:
 	@param tripDistance distance covered by the ticket
 	@param economyClass true for economy class; false for business class
 	*/
-	float normalFare(float tripDistance, bool economyClass = true) override;
+	virtual float normalFare(float tripDistance, bool economyClass = true) = 0;
 
 	/**
 	Fare considering also the urgency and occupancy.
@@ -70,6 +58,6 @@ public:
 	of a number of seats within the desired class - business / economy
 	@param economyClass true for economy class; false for business class
 	*/
-	float airplaneFare(float tripDistance, float urgency, float occupancy,
-					   bool economyClass = true) override;
+	virtual float airplaneFare(float tripDistance, float urgency, float occupancy,
+							   bool economyClass = true) = 0;
 };
