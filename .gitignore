@@ -1,0 +1,10 @@
+*.aps
+*.bak
+*.opendb
+*.sdf
+*.user
+
+.vs
+ipch
+TestResults
+x64
