@@ -23,7 +23,7 @@
  *****************************************************************************/
 
 #include "CppUnitTest.h"
-#include "../pricing.h"
+#include "pricing.h"
 
 #include <stdexcept>
 
@@ -105,7 +105,7 @@ namespace UnitTests {
 
 		TEST_METHOD(TicketPriceCalculator_correctFareQueries_ExpectedPrices) {
 			Logger::WriteMessage(__FUNCTION__);
-			const float lowFareFactor = 0.75f,
+			constexpr float lowFareFactor = 0.75f,
 				highFareFactor = 2.f;
 			try {
 				::TicketPriceCalculator tpc(1.f, // kEconomy

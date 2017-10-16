@@ -55,14 +55,14 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>$(VCInstallDir)UnitTest\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)src;$(BoostDir);$(VCInstallDir)UnitTest\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <UseFullPaths>true</UseFullPaths>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(VCInstallDir)UnitTest\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(BoostDir)stage$(PlatformArchitecture)\$(PlatformToolset)\lib;%(AdditionalLibraryDirectories);$(VCInstallDir)UnitTest\lib</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -72,7 +72,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <AdditionalIncludeDirectories>$(VCInstallDir)UnitTest\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)src;$(BoostDir);$(VCInstallDir)UnitTest\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <UseFullPaths>true</UseFullPaths>
     </ClCompile>
@@ -81,13 +81,25 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(VCInstallDir)UnitTest\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(BoostDir)stage$(PlatformArchitecture)\$(PlatformToolset)\lib;%(AdditionalLibraryDirectories);$(VCInstallDir)UnitTest\lib</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\main.cpp" />
-    <ClCompile Include="..\pricing.cpp" />
+    <ClCompile Include="..\src\connection.cpp" />
+    <ClCompile Include="..\src\constraints.cpp" />
+    <ClCompile Include="..\src\main.cpp" />
+    <ClCompile Include="..\src\planner.cpp" />
+    <ClCompile Include="..\src\pricing.cpp" />
+    <ClCompile Include="..\src\results.cpp" />
+    <ClCompile Include="..\src\util.cpp" />
+    <ClCompile Include="..\src\variant.cpp" />
+    <ClCompile Include="..\src\variants.cpp" />
+    <ClCompile Include="testConnection.cpp" />
+    <ClCompile Include="testConstraints.cpp" />
+    <ClCompile Include="testPlanner.cpp" />
     <ClCompile Include="testPricing.cpp" />
+    <ClCompile Include="testUtil.cpp" />
+    <ClCompile Include="testVariant.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\TripPlanner.vcxproj">
@@ -95,7 +107,17 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\pricing.h" />
+    <None Include="..\TripPlanner.licenseheader" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\src\connection.h" />
+    <ClInclude Include="..\src\constraints.h" />
+    <ClInclude Include="..\src\planner.h" />
+    <ClInclude Include="..\src\pricing.h" />
+    <ClInclude Include="..\src\results.h" />
+    <ClInclude Include="..\src\util.h" />
+    <ClInclude Include="..\src\variant.h" />
+    <ClInclude Include="..\src\variants.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -63,6 +63,7 @@
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
+      <AdditionalLibraryDirectories>$(BoostDir)stage$(PlatformArchitecture)\$(PlatformToolset)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -84,18 +85,36 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <SubSystem>Console</SubSystem>
+      <AdditionalLibraryDirectories>$(BoostDir)stage$(PlatformArchitecture)\$(PlatformToolset)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClCompile Include="main.cpp" />
-    <ClCompile Include="pricing.cpp" />
-  </ItemGroup>
   <ItemGroup>
     <None Include="TripPlanner.licenseheader" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="pricing.h" />
-    <ClInclude Include="pricingBase.h" />
+    <ClInclude Include="src\connection.h" />
+    <ClInclude Include="src\constraints.h" />
+    <ClInclude Include="src\constraintsBase.h" />
+    <ClInclude Include="src\planner.h" />
+    <ClInclude Include="src\pricing.h" />
+    <ClInclude Include="src\pricingBase.h" />
+    <ClInclude Include="src\results.h" />
+    <ClInclude Include="src\resultsBase.h" />
+    <ClInclude Include="src\util.h" />
+    <ClInclude Include="src\variant.h" />
+    <ClInclude Include="src\variants.h" />
+    <ClInclude Include="src\variantsBase.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\connection.cpp" />
+    <ClCompile Include="src\constraints.cpp" />
+    <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\planner.cpp" />
+    <ClCompile Include="src\pricing.cpp" />
+    <ClCompile Include="src\results.cpp" />
+    <ClCompile Include="src\util.cpp" />
+    <ClCompile Include="src\variant.cpp" />
+    <ClCompile Include="src\variants.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -22,10 +22,15 @@
  If not, see <http://www.gnu.org/licenses/agpl-3.0.txt>.
  *****************************************************************************/
 
-#include <iostream>
+#include "planner.h"
 
 using namespace std;
 
-void main(int argc, const char* argv[]) {
-	
+void main(/*int argc, const char* argv[]*/) {
+	TripPlanner tp("dataPath");
+	const unique_ptr<IResults> results = tp.search("abc", "def", 10ULL);
+	if(nullptr == results)
+		cout<<"There were no results!"<<endl;
+	else
+		cout<<*results<<endl;
 }
