@@ -22,24 +22,24 @@
  If not, see <http://www.gnu.org/licenses/agpl-3.0.txt>.
  *****************************************************************************/
 
-#pragma once
+#include "placeBase.h"
 
-#include <string>
-#include <vector>
+#include <sstream>
 
-/// Prevents warnings about unused parameters
-#define UNREFERENCED(p) p;
+using namespace std;
 
-/// Specifying container ranges
-#define CBOUNDS(cont) std::cbegin(cont), std::cend(cont)
-#define CRBOUNDS(cont) std::crbegin(cont), std::crend(cont)
-#define BOUNDS(cont) std::begin(cont), std::end(cont)
-#define RBOUNDS(cont) std::rbegin(cont), std::rend(cont)
+ bool IfUniquePlace::operator<(const IfUniquePlace &rhs) const {
+	 return name().compare(rhs.name()) < 0;
+ }
 
-// Let just 1 unit instantiate this template used below
-extern template std::vector<std::string>;
+ string IfUniquePlace::toString() const {
+	ostringstream oss;
+	oss<<"Unique place traits: name='"<<name()<<'\'';
+	return oss.str();
+}
 
-/// Tokenizes a string based on the provided regex delimiter expression
-/// Default delimiter is one or more space-like characters
-std::vector<std::string> tokenize(const std::string &s,
-								  const std::string &regexDelimStr = R"(\s+)");
+string IfPlace::toString() const {
+	ostringstream oss;
+	oss<<"Place{ id="<<id()<<"; name='"<<name()<<"' }";
+	return oss.str();
+}

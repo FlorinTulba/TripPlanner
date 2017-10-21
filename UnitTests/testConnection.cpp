@@ -24,6 +24,8 @@
 
 #include "CppUnitTest.h"
 #include "connection.h"
+#include "customDateTimeProcessor.h"
+#include "transpModes.h"
 
 #include <stdexcept>
 #include <memory>
@@ -40,7 +42,7 @@ namespace UnitTests {
 		TEST_METHOD(Connection_InvalidCtorParams_Throws) {
 			Logger::WriteMessage(__FUNCTION__);
 
-			const ptime now = second_clock::universal_time(),
+			const ptime now = nowUTC(),
 				after2Hours = now + hours(2);
 
 			// Identical from and to
@@ -86,7 +88,7 @@ namespace UnitTests {
 		TEST_METHOD(Connection_correctCtorParams_ExpectedDuration) {
 			Logger::WriteMessage(__FUNCTION__);
 
-			const ptime now = second_clock::universal_time(),
+			const ptime now = nowUTC(),
 				after2Hours = now + hours(2);
 
 			try {

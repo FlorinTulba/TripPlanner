@@ -22,24 +22,22 @@
  If not, see <http://www.gnu.org/licenses/agpl-3.0.txt>.
  *****************************************************************************/
 
-#pragma once
+#include "place.h"
 
-#include <string>
-#include <vector>
+using namespace std;
 
-/// Prevents warnings about unused parameters
-#define UNREFERENCED(p) p;
+UniquePlace::UniquePlace(const string &name_) : _name(name_) {}
 
-/// Specifying container ranges
-#define CBOUNDS(cont) std::cbegin(cont), std::cend(cont)
-#define CRBOUNDS(cont) std::crbegin(cont), std::crend(cont)
-#define BOUNDS(cont) std::begin(cont), std::end(cont)
-#define RBOUNDS(cont) std::rbegin(cont), std::rend(cont)
+UniquePlace::UniquePlace(const IfUniquePlace &other) :
+	UniquePlace(other.name()) {}
 
-// Let just 1 unit instantiate this template used below
-extern template std::vector<std::string>;
+const string& UniquePlace::name() const {
+	return _name;
+}
 
-/// Tokenizes a string based on the provided regex delimiter expression
-/// Default delimiter is one or more space-like characters
-std::vector<std::string> tokenize(const std::string &s,
-								  const std::string &regexDelimStr = R"(\s+)");
+Place::Place(unsigned id_, const string &name_) :
+	UniquePlace(name_), _id(id_) {}
+
+unsigned Place::id() const {
+	return _id;
+}

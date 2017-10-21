@@ -1,0 +1,138 @@
+{"Scenario": {
+
+"-- Comment --": [
+	"== Data about Places ==",
+	" * Unique id-s and name-s for now",
+	" * Later: aliases, GPS location, continent, country, county, locale, timezone, zip, currency, etc"
+],
+"Places" : [
+	{"id":0, "name":"p0"},
+	{"id":1, "name":"p1"},
+	{"id":2, "name":"p2"},
+	{"id":3, "name":"p3"},
+	{"id":4, "name":"p4"},
+	{"id":5, "name":"p5"},
+	{"id":6, "name":"p6"},
+	{"id":7, "name":"p7"},
+	{"id":8, "name":"p8"},
+	{"id":9, "name":"p9"},
+	{"id":10, "name":"p10"},
+	{"id":11, "name":"p11"},
+	{"id":12, "name":"p12"},
+	{"id":13, "name":"p13"},
+	{"id":14, "name":"p14"},
+	{"id":15, "name":"p15"}],
+
+"-- Comment --": [
+	"== Data for Routes ==",
+	" * Unique bundleId",
+	" * The transport mode (TM): Air/Rail/Road/Water",
+	" * Operational days of the week (ODW) - optional",
+	"   as bit string for Sun-Mon-Tue-Wed-Thu-Fri-Sat.",
+	"       Ex: 0111110  When not specified, it defaults to 1111111",
+	" * Unoperational days of the year ahead (UDYA).",
+	"       Ex: July-4|Dec-25|Dec-31",
+	"    The dates referring to months before current month",
+	"    actually point to those months from the next year",
+	" * A fare constant for the economy class (EF) - ex: 3.5",
+	"   and optionally a fare the business class seats (BF).",
+	"   Airplane tickets involve also a low fare factor (LFF)",
+	"   and a high fare factor (HFF).",
+	" * The route ends and the stopovers in order, mentioning",
+	"   the distances between consecutive stops.",
+	" * The alternatives for traversing the route:",
+	"       - capacity: the number of economy and business class seats",
+	"         available (ESA - mandatory and BSA - optional)",
+	"       - an optional boolean to mark return trips",
+	"       - the time-table (TT) of this option.",
+	"          Ex:    7:30-9:0|9:10-10:15|10:30-28:20",
+	"           means leaving at 7:30 of the given day,",
+	"           taking 2 stopovers of 10 & 15 minutes and",
+	"           arriving the next day at 4:20 (28:20 - 24:00)",
+	"       - exceptions, if any from ODW and UDYA"
+],
+"Routes": [
+	{"bundleId":1, "TM" : "Road", "ODW" : "0111110",
+	"UDYA" : "Jan-1|Jan-2|Jan-3|Apr-4|July-4|Jul-14|Dec-25|Dec-31",
+	"EF" : 3.5,
+	"Route" : {"StartPlaceId":1, "Links": [
+			{"NextPlaceId":2, "dist" : 90.5},
+			{"NextPlaceId":3, "dist" : 70.2},
+			{"NextPlaceId":4, "dist" : 93.4},
+			{"NextPlaceId":5, "dist" : 115.9},
+			{"NextPlaceId":6, "dist" : 208.6}]},
+	"Alternatives" : [
+		{"ESA" : 20, "TT":
+		"7:30-9:0|9:10-10:15|10:30-12:0|12:15-14:30|15:0-19:0"},
+		
+		{"ESA" : 50, "TT":
+		"10:0-11:30|11:40-13:0|13:15-15:0|15:15-17:45|18:15-22:30"},
+		
+		{"ESA" : 50, "UDYA" : "Jan-1 Jan-2 31.12", "TT":
+		"13:0-15:0|15:10-19:0|19:15-20:40|21:0-24:0|24:15-28:0"},
+		
+		{"ESA" : 50, "TT":
+		"18:0-19:30|19:40-20:15|20:30-22:0|22:15-26:30|26:45-29:30"},
+		
+		{"ESA" : 20, "ReturnTrip" : true, "TT":
+		"21:0-25:0|25:30-27:45|28:0-29:30|29:45-30:50|31:0-32:30"},
+		
+		{"ESA" : 50, "ReturnTrip" : true, "TT":
+		"0:30-4:30|5:0-7:15|7:30-9:0|9:15-10:20|10:30-12:0"},
+		
+		{"ESA" : 50, "ReturnTrip" : true, "TT":
+		"6:0-10:0|10:15-12:30|12:45-14:15|14:30-15:35|15:45-17:15"},
+		
+		{"ESA" : 50, "ReturnTrip" : true, "TT":
+		"7:30-11:30|12:0-14:15|14:30-16:0|16:15-17:20|17:30-19:0"}
+	]},
+
+	{"bundleId":2, "TM" : "Rail", "ODW" : "1111111",
+	"UDYA" : "Jan-1|Jan-2|Jan-3|Apr-4|July-4|Jul-14|Dec-25|Dec-31",
+	"EF" : 4, "BF" : 6,
+	"Route" : {"StartPlaceId":1, "Links": [
+			{"NextPlaceId":7, "dist" : 40.8},
+			{"NextPlaceId":8, "dist" : 97.2},
+			{"NextPlaceId":9, "dist" : 51.5},
+			{"NextPlaceId":10, "dist" : 128.3},
+			{"NextPlaceId":11, "dist" : 12},
+			{"NextPlaceId":12, "dist" : 49.1},
+			{"NextPlaceId":13, "dist" : 30.3}]},
+	"Alternatives" : [
+		{"ESA" : 800, "BSA" : 50, "ODW" : "0111110", "TT":
+		"5:10-5:45|5:53-7:20|7:35-8:5|8:16-10:20|10:25-10:35|10:40-11:20|11:30-11:55"},
+		
+		{"ESA" : 800, "BSA" : 50, "ReturnTrip" : true, "TT":
+		"13:0-13:30|13:40-14:20|14:25-14:35|14:40-16:35|16:46-17:15|17:30-19:0|19:10-19:45"}
+	]},
+
+	{"bundleId":3, "TM" : "Water", "ODW" : "0101010",
+	"UDYA" : "Jan-1|Jan-2|Jan-3|Apr-4|July-4|Jul-14|Dec-25|Dec-31",
+	"EF" : 2.5, "BF" : 4,
+	"Route" : {"StartPlaceId":1, "Links": [
+			{"NextPlaceId":14, "dist" : 79},
+			{"NextPlaceId":15, "dist" : 34.2}]},
+	"Alternatives" : [
+		{"ESA" : 3000, "BSA" : 200, "TT":
+		"4:0-6:0|6:30-7:30"},
+		
+		{"ESA" : 3000, "BSA" : 200, "ReturnTrip" : true, "TT":
+		"9:0-10:0|10:30-12:30"}
+	]},
+
+	{"bundleId":4, "TM" : "Air",
+	"UDYA" : "Jan-1|Jan-2|Dec-31",
+	"EF" : 5, "BF" : 9, "LFF" : 0.4, "HFF" : 3.5,
+	"Route" : {"StartPlaceId":14, "Links": [
+			{"NextPlaceId":13, "dist" : 317}]},
+	"Alternatives" : [
+		{"ESA" : 180, "BSA" : 40, "TT":
+		"8:0-8:40"},
+
+		{"ESA" : 180, "BSA" : 40, "ReturnTrip" : true, "TT":
+		"15:45-16:25"}
+	]}],
+
+"-- Comment --":
+"Replaces with this text the value of previous longer comments, thus saving memory"
+}}

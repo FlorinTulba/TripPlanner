@@ -25,21 +25,37 @@
 #pragma once
 
 #include <string>
-#include <vector>
 
-/// Prevents warnings about unused parameters
-#define UNREFERENCED(p) p;
+/**
+Unique data about each mentioned place:
+- for now the name (this interface does not use id-s)
 
-/// Specifying container ranges
-#define CBOUNDS(cont) std::cbegin(cont), std::cend(cont)
-#define CRBOUNDS(cont) std::crbegin(cont), std::crend(cont)
-#define BOUNDS(cont) std::begin(cont), std::end(cont)
-#define RBOUNDS(cont) std::rbegin(cont), std::rend(cont)
+More realistic scenarios would use either GPS location or several from the
+following aspects:
+- aliases, continent, country, county, locale, timezone, zip, currency, etc.
 
-// Let just 1 unit instantiate this template used below
-extern template std::vector<std::string>;
+Realizations of this interface are enough to query for a specific place,
+to determine its id and the rest of its non-unique information.
+*/
+struct IfUniquePlace abstract {
+	virtual ~IfUniquePlace() = 0 {}
 
-/// Tokenizes a string based on the provided regex delimiter expression
-/// Default delimiter is one or more space-like characters
-std::vector<std::string> tokenize(const std::string &s,
-								  const std::string &regexDelimStr = R"(\s+)");
+	virtual const std::string& name() const = 0;
+
+	/// Since these are unique values, an ordering can be implemented
+	virtual bool operator<(const IfUniquePlace &rhs) const;
+
+	/// @return an arrangement of the details of a place
+	virtual std::string toString() const;
+};
+
+/**
+Adds the unique place id to the place.
+Later, some other less unique aspects can be added.
+*/
+struct IfPlace abstract : virtual IfUniquePlace {
+	virtual unsigned id() const = 0;
+
+	/// @return an arrangement of the details of a place
+	std::string toString() const override;
+};

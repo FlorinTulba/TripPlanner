@@ -32,11 +32,11 @@ using namespace boost::posix_time;
 
 TimeConstraints::TimeConstraints(const time_period &leavePeriod_/* =
 									time_period(
-										second_clock::universal_time(),
+										nowUTC(),
 										hours(366 * 24))*/,
 								 const time_period &arrivePeriod_/* =
 									time_period(
-										second_clock::universal_time(),
+										nowUTC(),
 										hours(366 * 24))*/) :
 		_leavePeriod(leavePeriod_.begin(), leavePeriod_.end() + time_duration::unit()),
 		_arrivePeriod(arrivePeriod_.begin(), arrivePeriod_.end() + time_duration::unit()) {

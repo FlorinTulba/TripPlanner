@@ -24,22 +24,32 @@
 
 #pragma once
 
-#include <string>
-#include <vector>
+#include "placeBase.h"
+#include "warnings.h"
 
-/// Prevents warnings about unused parameters
-#define UNREFERENCED(p) p;
+/// Realization of IfUniquePlace
+class UniquePlace : public virtual IfUniquePlace {
+protected:
+	std::string _name;
 
-/// Specifying container ranges
-#define CBOUNDS(cont) std::cbegin(cont), std::cend(cont)
-#define CRBOUNDS(cont) std::crbegin(cont), std::crend(cont)
-#define BOUNDS(cont) std::begin(cont), std::end(cont)
-#define RBOUNDS(cont) std::rbegin(cont), std::rend(cont)
+public:
+	UniquePlace(const std::string &name_);
 
-// Let just 1 unit instantiate this template used below
-extern template std::vector<std::string>;
+	/// Allows treating the interface IfUniquePlace like the actual realization class
+	UniquePlace(const IfUniquePlace &other);
 
-/// Tokenizes a string based on the provided regex delimiter expression
-/// Default delimiter is one or more space-like characters
-std::vector<std::string> tokenize(const std::string &s,
-								  const std::string &regexDelimStr = R"(\s+)");
+	const std::string& name() const override;
+};
+
+#pragma warning ( disable : INHERITANCE_VIA_DOMINANCE )
+/// Realization of IfPlace
+class Place : public UniquePlace, public IfPlace {
+protected:
+	unsigned _id;
+
+public:
+	Place(unsigned id_, const std::string &name_);
+
+	unsigned id() const override;
+};
+#pragma warning ( default : INHERITANCE_VIA_DOMINANCE )

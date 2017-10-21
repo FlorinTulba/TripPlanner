@@ -23,6 +23,7 @@
  *****************************************************************************/
 
 #include "connection.h"
+#include "transpModes.h"
 
 #include <cassert>
 #include <stdexcept>
@@ -45,7 +46,8 @@ Connection::Connection(size_t from_, size_t to_,
 		throw invalid_argument(__FUNCTION__
 							   " expects strictly positive price_ and dist,"
 							   " transpModes_ among the enum from TranspModes,"
-							   " non-empty interval_ and distinct from_ and to_!");
+							   " a non-empty interval_"
+							   " and distinct from_ and to_!");
 }
 
 ptime Connection::begin() const {

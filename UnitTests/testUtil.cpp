@@ -25,52 +25,48 @@
 #include "CppUnitTest.h"
 #include "util.h"
 
-#include <boost/date_time/posix_time/posix_time_types.hpp>
-#include <boost/date_time/gregorian/parsers.hpp>
-#include <boost/date_time/posix_time/time_parsers.hpp>
-
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 using namespace std;
-using namespace boost::posix_time;
-using namespace boost::gregorian;
 
 namespace UnitTests {
-	TEST_CLASS(DurationAndTimeFormatter) {
-	public:
-		TEST_METHOD(DurationFormatter_VariousDurations_ExpectedFormatting) {
-			Logger::WriteMessage(__FUNCTION__);
-
-			Assert::IsTrue(0 == formatDuration(minutes(0)).
-						   compare("0 minutes"));
-			Assert::IsTrue(0 == formatDuration(minutes(1)).
-						   compare("1 minute"));
-			Assert::IsTrue(0 == formatDuration(hours(1)).
-						   compare("1 hour and 0 minutes"));
-			Assert::IsTrue(0 == formatDuration(hours(1)+minutes(1)).
-						   compare("1 hour and 1 minute"));
-			Assert::IsTrue(0 == formatDuration(hours(2)).
-						   compare("2 hours and 0 minutes"));
-			Assert::IsTrue(0 == formatDuration(hours(23)+minutes(59)).
-						   compare("23 hours and 59 minutes"));
-			Assert::IsTrue(0 == formatDuration(hours(24)).
-						   compare("1 day, 0 hours and 0 minutes"));
-			Assert::IsTrue(0 == formatDuration(hours(48)-minutes(1)).
-						   compare("1 day, 23 hours and 59 minutes"));
-			Assert::IsTrue(0 == formatDuration(hours(48)).
-						   compare("2 days, 0 hours and 0 minutes"));
-			Assert::IsTrue(0 == formatDuration(hours(49)+minutes(1)).
-						   compare("2 days, 1 hour and 1 minute"));
+	TEST_CLASS(TokenizerTests) {
+		static inline bool compareStr(const string &s1,
+							   const string &s2) {
+			return s1.compare(s2) == 0;
 		}
 
-		TEST_METHOD(TimeFormatter_VariousTimes_ExpectedFormatting) {
+		static inline bool compareStrVectors(const vector<string> &v1,
+											 const vector<string> &v2) {
+			return v1.size() == v2.size() &&
+				equal(CBOUNDS(v1), cbegin(v2), compareStr);
+		}
+
+	public:
+		TEST_METHOD(TokenizerTests_VariousInput_ExpectedOutput) {
 			Logger::WriteMessage(__FUNCTION__);
 
-			Assert::IsTrue(0 == formatTimePoint(
-				ptime(from_simple_string("2017-Oct-17"), duration_from_string("7:4"))).
-				compare("Tue Oct-17-2017 07:04"));
-			Assert::IsTrue(0 == formatTimePoint(
-				ptime(from_simple_string("2017-Jan-25"), duration_from_string("22:50"))).
-				compare("Wed Jan-25-2017 22:50"));
+			// Chars separated by 1 or more space-like symbols
+			string inp = "a \tb\t \tc\t\t d   \t e f";
+			vector<string> expect = {"a", "b", "c", "d", "e", "f"},
+				produced = tokenize(inp);
+			Assert::IsTrue(compareStrVectors(expect, produced));
+
+			// Chars separated by a '-' among 0 or more space-like symbols
+			inp = "a \t-   \t b-c -\t\td-e-f";
+			produced = tokenize(inp, R"(\s*-\s*)");
+			Assert::IsTrue(compareStrVectors(expect, produced));
+
+			// Chars separated by a '|' among 0 or more space-like symbols
+			inp = "a \t|   \t b|c |\t\td|e|f"; produced = tokenize(inp, R"(\s*\|\s*)");
+			Assert::IsTrue(compareStrVectors(expect, produced));
+
+			// The same input - looking for '-' when there are none
+			produced = tokenize(inp, "-"); expect = {inp};
+			Assert::IsTrue(compareStrVectors(expect, produced));
+
+			// Empty input
+			inp = ""; produced = tokenize(inp); expect.clear();
+			Assert::IsTrue(compareStrVectors(expect, produced));
 		}
 	};
 }

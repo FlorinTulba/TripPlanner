@@ -22,24 +22,35 @@
  If not, see <http://www.gnu.org/licenses/agpl-3.0.txt>.
  *****************************************************************************/
 
-#pragma once
+#include "dbSource.h"
 
-#include <string>
-#include <vector>
+using namespace std;
 
-/// Prevents warnings about unused parameters
-#define UNREFERENCED(p) p;
+DbSource::DbSource(const string &dbUrl, const string &dbName,
+				   const IfCredentials &credentialsProvider) {}
 
-/// Specifying container ranges
-#define CBOUNDS(cont) std::cbegin(cont), std::cend(cont)
-#define CRBOUNDS(cont) std::crbegin(cont), std::crend(cont)
-#define BOUNDS(cont) std::begin(cont), std::end(cont)
-#define RBOUNDS(cont) std::rbegin(cont), std::rend(cont)
+IfPlace& DbSource::getPlace(unsigned id) const {
+	throw exception("");
+}
 
-// Let just 1 unit instantiate this template used below
-extern template std::vector<std::string>;
+IfPlace& DbSource::getPlace(const IfUniquePlace &uniquePlaceTraits) const {
+	throw exception("");
+}
 
-/// Tokenizes a string based on the provided regex delimiter expression
-/// Default delimiter is one or more space-like characters
-std::vector<std::string> tokenize(const std::string &s,
-								  const std::string &regexDelimStr = R"(\s+)");
+void DbSource::bundlesForPlace(unsigned placeId,
+							   set<unsigned> &bundleIds) const {
+	throw exception("");
+}
+
+void DbSource::bundlesForPlaces(const set<unsigned> &placeIds,
+								set<unsigned> &bundleIds) const {
+	throw exception("");
+}
+
+IRoutesBundle& DbSource::getRoutesBundle(unsigned bundleId) const {
+	throw exception("");
+}
+
+IRouteAlternative& DbSource::getRouteAlternative(unsigned raId) const {
+	throw exception("");
+}

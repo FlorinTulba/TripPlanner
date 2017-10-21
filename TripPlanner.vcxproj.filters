@@ -13,75 +13,174 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Header Files\Queries">
+      <UniqueIdentifier>{cf1710d1-dbf1-4ad1-9cad-5807c94204cf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Queries">
+      <UniqueIdentifier>{5c674150-b726-4e0e-9ca6-930106f3de96}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Queries\Results">
+      <UniqueIdentifier>{95063f7a-d08e-41e0-ba30-343f7f3e2adc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Queries\Results">
+      <UniqueIdentifier>{6b278bf6-7a50-4978-b62c-9e28f1eb1b30}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Specs">
+      <UniqueIdentifier>{0145f278-5314-4aa8-bcdc-ae2e1da92d79}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Specs">
+      <UniqueIdentifier>{a63d34dd-0284-4c8e-b0f9-955e5a0f7300}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Specs\Json">
+      <UniqueIdentifier>{d54f9055-b1c7-4488-8621-4f20412a1ca6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Specs\Db">
+      <UniqueIdentifier>{0c22cbcb-fd1e-4c2d-be08-3048c1e00138}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Specs\Json">
+      <UniqueIdentifier>{dc933740-ced2-469b-96d1-f3c00cd6fb8f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Specs\Db">
+      <UniqueIdentifier>{2411d7e1-130c-42d3-b6df-d56fb595bfbe}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="TripPlanner.licenseheader" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\connection.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\constraints.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\constraintsBase.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\planner.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\pricing.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\pricingBase.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\results.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\resultsBase.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\util.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\connection.h">
+      <Filter>Header Files\Queries\Results</Filter>
+    </ClInclude>
+    <ClInclude Include="src\constraints.h">
+      <Filter>Header Files\Queries</Filter>
+    </ClInclude>
+    <ClInclude Include="src\constraintsBase.h">
+      <Filter>Header Files\Queries</Filter>
+    </ClInclude>
+    <ClInclude Include="src\planner.h">
+      <Filter>Header Files\Queries</Filter>
+    </ClInclude>
+    <ClInclude Include="src\pricingBase.h">
+      <Filter>Header Files\Specs</Filter>
+    </ClInclude>
+    <ClInclude Include="src\pricing.h">
+      <Filter>Header Files\Specs</Filter>
+    </ClInclude>
+    <ClInclude Include="src\results.h">
+      <Filter>Header Files\Queries\Results</Filter>
+    </ClInclude>
+    <ClInclude Include="src\resultsBase.h">
+      <Filter>Header Files\Queries\Results</Filter>
+    </ClInclude>
     <ClInclude Include="src\variant.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Queries\Results</Filter>
     </ClInclude>
     <ClInclude Include="src\variants.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Queries\Results</Filter>
     </ClInclude>
     <ClInclude Include="src\variantsBase.h">
+      <Filter>Header Files\Queries\Results</Filter>
+    </ClInclude>
+    <ClInclude Include="src\infoSource.h">
+      <Filter>Header Files\Specs</Filter>
+    </ClInclude>
+    <ClInclude Include="src\placeBase.h">
+      <Filter>Header Files\Specs</Filter>
+    </ClInclude>
+    <ClInclude Include="src\place.h">
+      <Filter>Header Files\Specs</Filter>
+    </ClInclude>
+    <ClInclude Include="src\warnings.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\jsonSource.h">
+      <Filter>Header Files\Specs\Json</Filter>
+    </ClInclude>
+    <ClInclude Include="src\dbSource.h">
+      <Filter>Header Files\Specs\Db</Filter>
+    </ClInclude>
+    <ClInclude Include="src\credentialsBase.h">
+      <Filter>Header Files\Specs\Db</Filter>
+    </ClInclude>
+    <ClInclude Include="src\credentialsProvider.h">
+      <Filter>Header Files\Specs\Db</Filter>
+    </ClInclude>
+    <ClInclude Include="src\customDateTimeProcessor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\routeAlternativeBase.h">
+      <Filter>Header Files\Specs</Filter>
+    </ClInclude>
+    <ClInclude Include="src\routeAlternative.h">
+      <Filter>Header Files\Specs</Filter>
+    </ClInclude>
+    <ClInclude Include="src\routesBundleBase.h">
+      <Filter>Header Files\Specs</Filter>
+    </ClInclude>
+    <ClInclude Include="src\routesBundle.h">
+      <Filter>Header Files\Specs</Filter>
+    </ClInclude>
+    <ClInclude Include="src\transpModes.h">
+      <Filter>Header Files\Specs</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\connection.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\constraints.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\planner.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\pricing.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\results.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\util.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\connection.cpp">
+      <Filter>Source Files\Queries\Results</Filter>
+    </ClCompile>
+    <ClCompile Include="src\constraints.cpp">
+      <Filter>Source Files\Queries</Filter>
+    </ClCompile>
+    <ClCompile Include="src\planner.cpp">
+      <Filter>Source Files\Queries</Filter>
+    </ClCompile>
+    <ClCompile Include="src\pricing.cpp">
+      <Filter>Source Files\Specs</Filter>
+    </ClCompile>
     <ClCompile Include="src\variant.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Queries\Results</Filter>
     </ClCompile>
     <ClCompile Include="src\variants.cpp">
+      <Filter>Source Files\Queries\Results</Filter>
+    </ClCompile>
+    <ClCompile Include="src\results.cpp">
+      <Filter>Source Files\Queries\Results</Filter>
+    </ClCompile>
+    <ClCompile Include="src\place.cpp">
+      <Filter>Source Files\Specs</Filter>
+    </ClCompile>
+    <ClCompile Include="src\placeBase.cpp">
+      <Filter>Source Files\Specs</Filter>
+    </ClCompile>
+    <ClCompile Include="src\dbSource.cpp">
+      <Filter>Source Files\Specs\Db</Filter>
+    </ClCompile>
+    <ClCompile Include="src\jsonSource.cpp">
+      <Filter>Source Files\Specs\Json</Filter>
+    </ClCompile>
+    <ClCompile Include="src\credentialsProvider.cpp">
+      <Filter>Source Files\Specs\Db</Filter>
+    </ClCompile>
+    <ClCompile Include="src\customDateTimeProcessor.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\routeAlternative.cpp">
+      <Filter>Source Files\Specs</Filter>
+    </ClCompile>
+    <ClCompile Include="src\routesBundle.cpp">
+      <Filter>Source Files\Specs</Filter>
+    </ClCompile>
+    <ClCompile Include="src\transpModes.cpp">
+      <Filter>Source Files\Specs</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -56,7 +56,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>$(SolutionDir)src;$(BoostDir);$(VCInstallDir)UnitTest\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>UNIT_TESTING;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <UseFullPaths>true</UseFullPaths>
     </ClCompile>
     <Link>
@@ -73,7 +73,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <AdditionalIncludeDirectories>$(SolutionDir)src;$(BoostDir);$(VCInstallDir)UnitTest\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>UNIT_TESTING;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <UseFullPaths>true</UseFullPaths>
     </ClCompile>
     <Link>
@@ -87,15 +87,27 @@
   <ItemGroup>
     <ClCompile Include="..\src\connection.cpp" />
     <ClCompile Include="..\src\constraints.cpp" />
-    <ClCompile Include="..\src\main.cpp" />
+    <ClCompile Include="..\src\credentialsProvider.cpp" />
+    <ClCompile Include="..\src\customDateTimeProcessor.cpp" />
+    <ClCompile Include="..\src\dbSource.cpp" />
+    <ClCompile Include="..\src\jsonSource.cpp" />
+    <ClCompile Include="..\src\place.cpp" />
+    <ClCompile Include="..\src\placeBase.cpp" />
     <ClCompile Include="..\src\planner.cpp" />
     <ClCompile Include="..\src\pricing.cpp" />
     <ClCompile Include="..\src\results.cpp" />
+    <ClCompile Include="..\src\routeAlternative.cpp" />
+    <ClCompile Include="..\src\routesBundle.cpp" />
+    <ClCompile Include="..\src\transpModes.cpp" />
     <ClCompile Include="..\src\util.cpp" />
     <ClCompile Include="..\src\variant.cpp" />
     <ClCompile Include="..\src\variants.cpp" />
     <ClCompile Include="testConnection.cpp" />
     <ClCompile Include="testConstraints.cpp" />
+    <ClCompile Include="testCredentialsProvider.cpp" />
+    <ClCompile Include="testCustomDateTimeProcessor.cpp" />
+    <ClCompile Include="testDbSource.cpp" />
+    <ClCompile Include="testJsonSource.cpp" />
     <ClCompile Include="testPlanner.cpp" />
     <ClCompile Include="testPricing.cpp" />
     <ClCompile Include="testUtil.cpp" />
@@ -108,13 +120,23 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="..\TripPlanner.licenseheader" />
+    <None Include="TestFiles\credentialsNotOk.bin" />
+    <None Include="TestFiles\credentialsOk.bin" />
+    <None Include="TestFiles\specsOk.json" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\connection.h" />
     <ClInclude Include="..\src\constraints.h" />
+    <ClInclude Include="..\src\credentialsProvider.h" />
+    <ClInclude Include="..\src\customDateTimeProcessor.h" />
+    <ClInclude Include="..\src\dbSource.h" />
+    <ClInclude Include="..\src\jsonSource.h" />
     <ClInclude Include="..\src\planner.h" />
     <ClInclude Include="..\src\pricing.h" />
     <ClInclude Include="..\src\results.h" />
+    <ClInclude Include="..\src\routeAlternative.h" />
+    <ClInclude Include="..\src\routesBundle.h" />
+    <ClInclude Include="..\src\transpModes.h" />
     <ClInclude Include="..\src\util.h" />
     <ClInclude Include="..\src\variant.h" />
     <ClInclude Include="..\src\variants.h" />

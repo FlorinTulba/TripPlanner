@@ -25,27 +25,13 @@
 #pragma once
 
 #include <memory>
-#include <string>
 #include <vector>
 #include <iostream>
 
 #include <boost/date_time/posix_time/ptime.hpp>
 
-/// Transportation modes
-struct TranspModes {
-	enum {
-		AIR		= 1<<0,
-		RAIL	= 1<<1,
-		ROAD	= 1<<2,
-		WATER	= 1<<3
-	};
-
-	/// @return the description of the utilized transportation modes
-	static const std::string& toString(size_t masksCombination);
-};
-
 /// @return the names of the considered categories
-extern const std::vector<std::string>& variantCategories();
+extern const std::vector<const char*>& variantCategories();
 
 /// Connects 2 locations (directly or not)
 struct IConnection abstract {

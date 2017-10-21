@@ -24,37 +24,43 @@
 
 #pragma once
 
-#include "constraintsBase.h"
-#include "customDateTimeProcessor.h"
+#include "credentialsBase.h"
+#include "util.h"
 
-#include <boost/date_time/posix_time/posix_time_types.hpp>
+#include <iostream>
 
-/// Realization of ITimeConstraints
-class TimeConstraints : public ITimeConstraints {
+#include <boost/archive/binary_iarchive.hpp>
+#include <boost/archive/binary_oarchive.hpp>
+
+/**
+Realization of IfCredentials.
+It checks for a certain file containing the credentials.
+
+If the file doesn`t exist, it prompts the user for those credentials.
+In this case, it attempts to write the provided values to a file.
+When the file cannot be created, it just issues a warning about that.
+
+Although the output is a binary file, the credentials appear in clear,
+so it`s not a secure solution.
+*/
+class CredentialsProvider : public IfCredentials {
 protected:
-	/// Imposed period for departure
-	boost::posix_time::time_period _leavePeriod;
-
-	/// Imposed period for arrival
-	boost::posix_time::time_period _arrivePeriod;
+	std::string _user;
+	std::string _password;
 
 public:
 	/**
-	Imposed intervals for leaving and arrival.
-	The default intervals are each from now until a year from now.
+	Using promptStream is helpful for Unit testing
 	*/
-	TimeConstraints(const boost::posix_time::time_period &leavePeriod_ =
-						boost::posix_time::time_period(
-							nowUTC(),
-							boost::posix_time::hours(366 * 24)),
-					const boost::posix_time::time_period &arrivePeriod_ =
-						boost::posix_time::time_period(
-							nowUTC(),
-							boost::posix_time::hours(366 * 24)));
+	CredentialsProvider(const std::string &credentialsFile,
+						std::istream &promptStream = std::cin);
 
-	/// Imposed period for departure
-	const boost::posix_time::time_period& leavePeriod() const override;
+	const std::string& user() const override;
+	const std::string& password() const override;
 
-	/// Imposed period for arrival
-	const boost::posix_time::time_period& arrivePeriod() const override;
+	template<class Archive>
+	void serialize(Archive &ar, const unsigned version) {
+		UNREFERENCED(version);
+		ar & _user & _password;
+	}
 };

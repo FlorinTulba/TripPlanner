@@ -43,11 +43,11 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <CodeAnalysisRuleSet>D:\Programs\VisualStudio2015\Team Tools\Static Analysis Tools\Rule Sets\NativeRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <RunCodeAnalysis>true</RunCodeAnalysis>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <CodeAnalysisRuleSet>D:\Programs\VisualStudio2015\Team Tools\Static Analysis Tools\Rule Sets\NativeRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <RunCodeAnalysis>true</RunCodeAnalysis>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -57,7 +57,7 @@
       <MultiProcessorCompilation>false</MultiProcessorCompilation>
       <EnableParallelCodeGeneration>true</EnableParallelCodeGeneration>
       <OpenMPSupport>true</OpenMPSupport>
-      <EnablePREfast>true</EnablePREfast>
+      <EnablePREfast>false</EnablePREfast>
       <AdditionalIncludeDirectories>$(BoostDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
@@ -77,7 +77,7 @@
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <EnableParallelCodeGeneration>true</EnableParallelCodeGeneration>
       <OpenMPSupport>true</OpenMPSupport>
-      <EnablePREfast>true</EnablePREfast>
+      <EnablePREfast>false</EnablePREfast>
       <AdditionalIncludeDirectories>$(BoostDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
@@ -95,23 +95,46 @@
     <ClInclude Include="src\connection.h" />
     <ClInclude Include="src\constraints.h" />
     <ClInclude Include="src\constraintsBase.h" />
+    <ClInclude Include="src\credentialsBase.h" />
+    <ClInclude Include="src\credentialsProvider.h" />
+    <ClInclude Include="src\customDateTimeProcessor.h" />
+    <ClInclude Include="src\dbSource.h" />
+    <ClInclude Include="src\infoSource.h" />
+    <ClInclude Include="src\jsonSource.h" />
+    <ClInclude Include="src\place.h" />
+    <ClInclude Include="src\placeBase.h" />
     <ClInclude Include="src\planner.h" />
     <ClInclude Include="src\pricing.h" />
     <ClInclude Include="src\pricingBase.h" />
     <ClInclude Include="src\results.h" />
     <ClInclude Include="src\resultsBase.h" />
+    <ClInclude Include="src\routeAlternative.h" />
+    <ClInclude Include="src\routeAlternativeBase.h" />
+    <ClInclude Include="src\routesBundle.h" />
+    <ClInclude Include="src\routesBundleBase.h" />
+    <ClInclude Include="src\transpModes.h" />
     <ClInclude Include="src\util.h" />
     <ClInclude Include="src\variant.h" />
     <ClInclude Include="src\variants.h" />
     <ClInclude Include="src\variantsBase.h" />
+    <ClInclude Include="src\warnings.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\connection.cpp" />
     <ClCompile Include="src\constraints.cpp" />
+    <ClCompile Include="src\credentialsProvider.cpp" />
+    <ClCompile Include="src\customDateTimeProcessor.cpp" />
+    <ClCompile Include="src\dbSource.cpp" />
+    <ClCompile Include="src\jsonSource.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\place.cpp" />
+    <ClCompile Include="src\placeBase.cpp" />
     <ClCompile Include="src\planner.cpp" />
     <ClCompile Include="src\pricing.cpp" />
     <ClCompile Include="src\results.cpp" />
+    <ClCompile Include="src\routeAlternative.cpp" />
+    <ClCompile Include="src\routesBundle.cpp" />
+    <ClCompile Include="src\transpModes.cpp" />
     <ClCompile Include="src\util.cpp" />
     <ClCompile Include="src\variant.cpp" />
     <ClCompile Include="src\variants.cpp" />

@@ -24,50 +24,20 @@
 
 #include "util.h"
 
-#include <sstream>
-#include <iomanip>
-#include <cassert>
+#include <regex>
+#include <algorithm>
+#include <iterator>
 
 using namespace std;
-using namespace boost::posix_time;
 
-string formatTimePoint(const ptime &mom) {
-	const auto timePart = mom.time_of_day();
-	const auto datePart = mom.date();
-	const auto ymd = datePart.year_month_day();
-	ostringstream oss;
-	oss<<datePart.day_of_week().as_short_string()<<' '
-		<<ymd.month.as_short_string()<<'-'
-		<<ymd.day<<'-'
-		<<ymd.year<<' '
-		<<setw(2)<<setfill('0')<<timePart.hours()<<':'
-		<<setw(2)<<setfill('0')<<timePart.minutes();
-	return oss.str();
-}
+template vector<string>; // forced template instantiation
+vector<string> tokenize(const string &s,
+						const string &regexDelimStr/* = R"(\s+)"*/) {
+	vector<string> tokens;
+	if(s.empty()) // without this test, the resulted vector will contain one empty string
+		return move(tokens);
 
-string formatDuration(const time_duration& dur) {
-	const auto asHours = dur.hours();
-	const div_t days_hours = div(asHours, 24);
-	const auto mins = dur.minutes();
-
-	ostringstream oss;
-	bool daysPartPresent = false;
-	if(days_hours.quot > 0) {
-		daysPartPresent = true;
-		oss<<days_hours.quot<<" day";
-		if(days_hours.quot > 1)
-			oss<<'s';
-		oss<<", ";
-	}
-	if(days_hours.rem > 0 || daysPartPresent) {
-		oss<<days_hours.rem<<" hour";
-		if(days_hours.rem != 1)
-			oss<<'s';
-		oss<<" and ";
-	}
-	oss<<mins<<" minute";
-	if(mins != 1)
-		oss<<'s';
-
-	return oss.str();
+	regex regexDelim(regexDelimStr);
+	copy(sregex_token_iterator(CBOUNDS(s), regexDelim, -1), {}, back_inserter(tokens));
+	return move(tokens);
 }

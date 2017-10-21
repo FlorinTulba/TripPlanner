@@ -24,22 +24,20 @@
 
 #pragma once
 
-#include <string>
-#include <vector>
+ /// Transportation modes
+struct TranspModes {
+	enum {
+		AIR = 1<<0,
+		RAIL = 1<<1,
+		ROAD = 1<<2,
+		WATER = 1<<3,
 
-/// Prevents warnings about unused parameters
-#define UNREFERENCED(p) p;
+		last = WATER // update this to be the last introduce transport mode
+	};
 
-/// Specifying container ranges
-#define CBOUNDS(cont) std::cbegin(cont), std::cend(cont)
-#define CRBOUNDS(cont) std::crbegin(cont), std::crend(cont)
-#define BOUNDS(cont) std::begin(cont), std::end(cont)
-#define RBOUNDS(cont) std::rbegin(cont), std::rend(cont)
+	/// @return the description of the utilized transportation modes
+	static const char* toString(size_t masksCombination);
 
-// Let just 1 unit instantiate this template used below
-extern template std::vector<std::string>;
-
-/// Tokenizes a string based on the provided regex delimiter expression
-/// Default delimiter is one or more space-like characters
-std::vector<std::string> tokenize(const std::string &s,
-								  const std::string &regexDelimStr = R"(\s+)");
+	/// @return the masksCombination corresponding to the transportation modes mentioned in description
+	static size_t fromString(const char* description);
+};

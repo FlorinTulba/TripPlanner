@@ -44,13 +44,13 @@ namespace UnitTests {
 
 			// First interval starts after the start of the second (default) interval
 			Assert::ExpectException<invalid_argument>([] {
-				const auto m = second_clock::universal_time() + years(2);
+				const auto m = nowUTC() + years(2);
 				::TimeConstraints tc(time_period(m, m));
 			});
 
 			// First interval ends after the end of the second interval
 			Assert::ExpectException<invalid_argument>([] {
-				const auto now = second_clock::universal_time();
+				const auto now = nowUTC();
 				::TimeConstraints tc(time_period(now, years(2)),
 									 time_period(now, years(1)));
 			});
@@ -60,15 +60,15 @@ namespace UnitTests {
 			Logger::WriteMessage(__FUNCTION__);
 
 			try {
-				const auto now = second_clock::universal_time();
+				const auto now = nowUTC();
 				time_period p1(now, seconds(1)), 
 					p2(now+hours(2), now+hours(3));
-				auto p3 = time_period(second_clock::universal_time(), years(1));
+				auto p3 = time_period(nowUTC(), years(1));
 				::TimeConstraints
 					tc1,
-					tc2(time_period(second_clock::universal_time(), years(1))),
+					tc2(time_period(nowUTC(), years(1))),
 					tc3(move(p3)),
-					tc4(p1, time_period(second_clock::universal_time(), years(1))),
+					tc4(p1, time_period(nowUTC(), years(1))),
 					tc5(p1, p2);
 			} catch(exception &e) {
 				Logger::WriteMessage(e.what());

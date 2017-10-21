@@ -23,6 +23,8 @@
  *****************************************************************************/
 
 #include "variant.h"
+#include "customDateTimeProcessor.h"
+#include "transpModes.h"
 #include "util.h"
 
 #include <cassert>

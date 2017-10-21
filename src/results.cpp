@@ -25,43 +25,17 @@
 #include "results.h"
 #include "variants.h"
 
-#include <stdexcept>
 #include <cassert>
 
 using namespace std;
 
-const string& TranspModes::toString(size_t masksCombination) {
-	static const vector<string> combinations {
-		"None",	// 0
-		"Air",	// 1
-		"Rail",	// 2
-		"Air+Rail",	// 3
-		"Road",	// 4
-		"Air+Road", // 5
-		"Rail+Road", // 6
-		"Air+Rail+Road", // 7
-		"Water", // 8
-		"Air+Water", // 9
-		"Rail+Water", // 10
-		"Air+Rail+Water", // 11
-		"Road+Water", // 12
-		"Air+Road+Water", // 13
-		"Rail+Road+Water", // 14
-		"Air+Rail+Road+Water" // 15
-	};
-
-	if(masksCombination == 0ULL || masksCombination >= combinations.size())
-		throw invalid_argument(__FUNCTION__ " accepts values between [1,15]!");
-
-	return combinations[masksCombination];
-}
-
-const vector<string>& variantCategories() {
-	static const vector<string> categs {
+const vector<const char*>& variantCategories() {
+	static const vector<const char*> categs {
 		"most rapid variants",
 		"cheapest variants",
 		"shortest routes",
-		"variants getting to the destination the soonest"
+		"variants getting to the destination the soonest",
+		"variants with shortest stationary time"
 	};
 	return categs;
 }

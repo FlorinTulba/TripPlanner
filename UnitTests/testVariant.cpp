@@ -25,6 +25,8 @@
 #include "CppUnitTest.h"
 #include "variant.h"
 #include "connection.h"
+#include "customDateTimeProcessor.h"
+#include "transpModes.h"
 
 #include <stdexcept>
 
@@ -37,7 +39,7 @@ using namespace boost::posix_time;
 namespace UnitTests {
 	TEST_CLASS(Variant) {
 		const ptime
-			now = second_clock::universal_time(),
+			now = nowUTC(),
 			after2Hours = now + hours(2),
 			after3Hours = now + hours(3),
 			after4Hours = now + hours(4),

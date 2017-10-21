@@ -24,22 +24,5 @@
 
 #pragma once
 
-#include <string>
-#include <vector>
-
-/// Prevents warnings about unused parameters
-#define UNREFERENCED(p) p;
-
-/// Specifying container ranges
-#define CBOUNDS(cont) std::cbegin(cont), std::cend(cont)
-#define CRBOUNDS(cont) std::crbegin(cont), std::crend(cont)
-#define BOUNDS(cont) std::begin(cont), std::end(cont)
-#define RBOUNDS(cont) std::rbegin(cont), std::rend(cont)
-
-// Let just 1 unit instantiate this template used below
-extern template std::vector<std::string>;
-
-/// Tokenizes a string based on the provided regex delimiter expression
-/// Default delimiter is one or more space-like characters
-std::vector<std::string> tokenize(const std::string &s,
-								  const std::string &regexDelimStr = R"(\s+)");
+// The warnings intentionally suppressed by the project when there's no danger
+#define INHERITANCE_VIA_DOMINANCE 4250
