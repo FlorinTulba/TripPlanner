@@ -25,28 +25,17 @@
 #pragma once
 
 #include "pricingBase.h"
+#include "routeCustomizableInfoBase.h"
 
-#include <set>
 #include <vector>
-#include <bitset>
-#include <memory>
-
-#include <boost/date_time/gregorian/greg_date.hpp>
 
 /// Common information relevant for several alternatives of a route
-struct IRoutesBundle abstract {
-	virtual ~IRoutesBundle() = 0 {}
+struct IRouteSharedInfo abstract {
+	virtual ~IRouteSharedInfo() = 0 {}
 
 	virtual unsigned id() const = 0;	///< unique id
 
 	virtual size_t transpMode() const = 0;	///< air/road/rail/water. @see TranspModes
-
-	/// Operational days of a week
-	virtual std::shared_ptr<std::bitset<7>> operationalDaysOfWeek() const = 0;
-	
-	/// The days from the year ahead when this transport is not available
-	virtual std::shared_ptr<std::set<boost::gregorian::date>>
-		unavailDaysForTheYearAhead() const = 0;
 
 	virtual size_t stopsCount() const = 0;	///< number of stops on the route
 
@@ -72,4 +61,7 @@ struct IRoutesBundle abstract {
 
 	/// The id-s of the alternatives of this route (different schedule, capacity..., but same route)
 	virtual const std::set<unsigned>& alternatives() const = 0;
+
+	/// Offers access to shared route information that can be customized
+	virtual const IRouteCustomizableInfo& customizableInfo() const = 0;
 };

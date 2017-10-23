@@ -33,11 +33,13 @@ using namespace std;
 using namespace boost::posix_time;
 using namespace boost::gregorian;
 
-RouteAlternative::RouteAlternative(unsigned id_, IRoutesBundle &rb,
+RouteAlternative::RouteAlternative(unsigned id_, IRouteSharedInfo &rsi,
 								   unsigned esa_, unsigned bsa_,
 								   const string &timetable_,
 								   bool returnTrip_) :
-		_rb(rb), odw(rb.operationalDaysOfWeek()), udya(rb.unavailDaysForTheYearAhead()),
+		_rsi(rsi),
+		odw(rsi.customizableInfo().operationalDaysOfWeek()),
+		udya(rsi.customizableInfo().unavailDaysForTheYearAhead()),
 		_id(id_), _returnTrip(returnTrip_), esa(esa_), bsa(bsa_) {
 	updateTimetable(timetable_);
 }
@@ -46,8 +48,8 @@ unsigned RouteAlternative::id() const {
 	return _id;
 }
 
-unsigned RouteAlternative::bundleId() const {
-	return _rb.id();
+const IRouteSharedInfo& RouteAlternative::routeSharedInfo() const {
+	return _rsi;
 }
 
 bool RouteAlternative::returnTrip() const {
@@ -77,12 +79,45 @@ const vector<time_period>& RouteAlternative::timetable() const {
 }
 
 void RouteAlternative::updateUnavailDaysForTheYearAhead(const string &udya_) {
-	udya = make_shared<set<date>>();
-	::updateUnavailDaysForTheYearAhead(udya_, *udya);
+	shared_ptr<set<date>> newUdya = make_shared<set<date>>();
+	::updateUnavailDaysForTheYearAhead(udya_, *newUdya);
+	
+	// Ensure the new set is a larger version of the previous udya
+	if(newUdya->size() > udya->size()) {
+		set<date> forgotten;
+		set_difference(CBOUNDS(*udya), CBOUNDS(*newUdya),
+					   inserter(forgotten, forgotten.begin()));
+		if(forgotten.empty()) {
+			udya = newUdya;
+			return;
+		}
+	}
+
+	ostringstream oss;
+	oss<<__FUNCTION__ " requires that the set of dates "
+		"provided by the udya_ parameter covers all "
+		"previously known unoperational days and adds new ones!";
+	throw domain_error(oss.str());
 }
 
 void RouteAlternative::updateOperationalDaysOfWeek(const string &odw_) {
-	odw = make_shared<bitset<7>>(string(CRBOUNDS(odw_)));
+	shared_ptr<bitset<7>> newOdw = make_shared<bitset<7>>(string(CRBOUNDS(odw_)));
+
+	// Ensure the new set of operational days within a week is
+	// a smaller version of the previous odw
+	if(newOdw->count() < odw->count()) {
+		const bitset<7> extraOperationalDays = *newOdw & ~*odw;
+		if(extraOperationalDays.none()) {
+			odw = newOdw;
+			return;
+		}
+	}
+
+	ostringstream oss;
+	oss<<__FUNCTION__ " requires that the set of days of the week "
+		"provided by the odw_ parameter covers less "
+		"from the previous set!";
+	throw domain_error(oss.str());
 }
 
 void RouteAlternative::updateTimetable(const string &timetable_) {
@@ -96,8 +131,8 @@ void RouteAlternative::updateTimetable(const string &timetable_) {
 
 	// The intervals are separated by '|' among 0 or more space-like symbols
 	const vector<string> intervals = tokenize(timetable_, R"(\s*\|\s*)");
-	if(intervals.size() + 1ULL != _rb.stopsCount()) {
-		oss<<"Current route bundle involves "<<_rb.stopsCount()<<" stops. "
+	if(intervals.size() + 1ULL != _rsi.stopsCount()) {
+		oss<<"Current route involves "<<_rsi.stopsCount()<<" stops. "
 			"However, the timetable `"<<timetable_<<"` presents a different situation.";
 		throw domain_error(oss.str());
 	}

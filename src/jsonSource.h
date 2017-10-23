@@ -65,16 +65,16 @@ public:
 	*/
 	IfPlace& getPlace(const IfUniquePlace &uniquePlaceTraits) const override;
 
-	/// Finds the route bundles covering the location with placeId
-	void bundlesForPlace(unsigned placeId, std::set<unsigned> &bundleIds) const override;
+	/// Finds the routes covering the location with placeId
+	void routesForPlace(unsigned placeId, std::set<unsigned> &routeSharedInfoIds) const override;
 
-	/// Finds the route bundles covering the locations with placeIds
-	void bundlesForPlaces(const std::set<unsigned> &placeIds,
-						  std::set<unsigned> &bundleIds) const override;
+	/// Finds the routes covering the locations with placeIds
+	void routesForPlaces(const std::set<unsigned> &placeIds,
+						 std::set<unsigned> &routeSharedInfoIds) const override;
 
-	/// @return the bundle with the given id
-	IRoutesBundle& getRoutesBundle(unsigned bundleId) const override;
+	/// @return the route shared information with the given id
+	IRouteSharedInfo& routeSharedInfo(unsigned routeSharedInfoId) const override;
 
 	/// @return the route alternative with the given id
-	IRouteAlternative& getRouteAlternative(unsigned raId) const override;
+	IRouteAlternative& routeAlternative(unsigned raId) const override;
 };

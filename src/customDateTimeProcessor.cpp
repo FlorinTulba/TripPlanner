@@ -97,9 +97,12 @@ void updateUnavailDaysForTheYearAhead(const string &udyaStr,
 	const vector<string> providedDays = tokenize(udyaStr, R"(\s*\|\s*)");
 
 	const date today = nowUTC().date();
+	const greg_year_month_day todayYMD = today.year_month_day();
+	const date startOfCurrentMonth =
+		today - days(todayYMD.day.as_number());
 
 	ostringstream oss;
-	oss<<today.year_month_day().year<<"-";
+	oss<<todayYMD.year<<"-";
 	const string thisYearPrefix(oss.str());
 	oss.str("");
 
@@ -108,8 +111,15 @@ void updateUnavailDaysForTheYearAhead(const string &udyaStr,
 		oss<<thisYearPrefix<<mentionedDay;
 		date unavailDay(from_simple_string(oss.str()));
 		oss.str("");
-		if(unavailDay < today)
-			unavailDay += years(1);
-		udyaSet.insert(unavailDay);
+		bool relevantDate = true;
+		if(unavailDay < today) {
+			// all dates before the start of the month are projected 1 year ahead
+			if(unavailDay < startOfCurrentMonth)
+				unavailDay += years(1);
+			else // dates between today and the start of the month can be ignored (they remain in the past)
+				relevantDate = false;
+		}
+		if(relevantDate)
+			udyaSet.insert(unavailDay);
 	}
 }

@@ -24,17 +24,35 @@
 
 #pragma once
 
-#include "routesBundleBase.h"
+#include "routeSharedInfoBase.h"
 
-class RoutesBundle : public IRoutesBundle {
+class RouteSharedInfo : public IRouteSharedInfo {
 protected:
-	size_t _transpMode = 0ULL;	///< air/road/rail/water. @see TranspModes
-	
-	/// Operational days of a week
-	std::shared_ptr<std::bitset<7>> odw;
+	/// Realization of IRouteCustomizableInfo
+	class RouteCustomizableInfo : public IRouteCustomizableInfo {
+	protected:
+		/// Operational days of a week
+		std::shared_ptr<std::bitset<7>> odw;
 
-	/// The days from the year ahead when this transport is not available
-	std::shared_ptr<std::set<boost::gregorian::date>> udya;
+		/// The days from the year ahead when this transport is not available
+		std::shared_ptr<std::set<boost::gregorian::date>> udya;
+
+	public:
+		RouteCustomizableInfo(const std::string &odw_, const std::string &udya_);
+
+		/// Operational days of a week
+		std::shared_ptr<std::bitset<7>> operationalDaysOfWeek() const override;
+
+		/// The days from the year ahead when this transport is not available
+		std::shared_ptr<std::set<boost::gregorian::date>>
+			unavailDaysForTheYearAhead() const override;
+	};
+
+	/// RouteAlternatives can use its data as is,
+	/// or they can create individual settings for any part of it
+	RouteCustomizableInfo routeCustomizableInfo;
+
+	size_t _transpMode = 0ULL;	///< air/road/rail/water. @see TranspModes
 	
 	/// id-s of the places from this route where there are stops
 	std::vector<unsigned> stops;
@@ -58,23 +76,21 @@ protected:
 
 public:
 	/**
+	Configures all data of a route shared
+	by several alternatives of the route.
+
+	The alternatives are added when they get created.
 	*/
-	RoutesBundle(unsigned id_, size_t transpMode_,
-				std::unique_ptr<ITicketPriceCalculator> pricingEng_,
-				const std::string &odw_ = "1111111");
+	RouteSharedInfo(unsigned id_, size_t transpMode_,
+					std::unique_ptr<ITicketPriceCalculator> pricingEng_,
+					const std::string &udya_ = "",
+					const std::string &odw_ = "1111111");
 
 	// Getter methods
 
 	unsigned id() const override;	///< unique id
 
 	size_t transpMode() const override;	///< air/road/rail/water. @see TranspModes
-
-	/// Operational days of a week
-	std::shared_ptr<std::bitset<7>> operationalDaysOfWeek() const override;
-	
-	/// The days from the year ahead when this transport is not available
-	std::shared_ptr<std::set<boost::gregorian::date>>
-		unavailDaysForTheYearAhead() const override;
 
 	size_t stopsCount() const override;	///< number of stops on the route
 
@@ -101,18 +117,10 @@ public:
 	/// The id-s of the alternatives of this route (different schedule, capacity..., but same route)
 	const std::set<unsigned>& alternatives() const override;
 
+	/// Offers access to shared route information that can be customized
+	const IRouteCustomizableInfo& customizableInfo() const override;
+
 	// Modifiers below
-
-	/**
-	The unoperational days of the year ahead are provided within a string
-	as D[D].M[M] dates separated by space.
-
-	The dates referring to months before current month actually point
-	to those months from the next year.
-
-	Should be called monthly, to update the dates for the last covered month from next year.
-	*/
-	void updateUnavailDaysForTheYearAhead(const std::string &udya_);
 
 	/// Marks the starting place when traversing the route directly
 	void setFirstPlace(unsigned placeId);

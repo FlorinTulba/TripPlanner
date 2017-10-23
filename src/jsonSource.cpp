@@ -25,7 +25,7 @@
 #include "jsonSource.h"
 #include "place.h"
 #include "variantsBase.h"
-#include "routesBundle.h"
+#include "routeSharedInfo.h"
 #include "routeAlternative.h"
 #include "pricing.h"
 #include "customDateTimeProcessor.h"
@@ -53,13 +53,15 @@ struct JsonSource::DataManager {
 	map<unsigned, Place> placeWithId;
 	map<UniquePlace, Place*> placeWithUniqueTraits;
 
-	/// The bundles; Didn't use vector, since some bundles might be removed,
+	/// The routes; Didn't use vector, since some routes might be removed,
 	/// thus, the remaining indices might not be a continuous sequence
-	map<unsigned, RoutesBundle> bundleById;
+	map<unsigned, RouteSharedInfo> rsiById;
 
-	/// The bundle (id-s) whose routes include a stop at a given place (id)
-	map<unsigned, set<unsigned>> bundlesForPlace;
+	/// The routes (id-s) who include a stop at a given place (id).
+	/// Places not covered by any routes are allowed.
+	map<unsigned, set<unsigned>> routesForPlace;
 
+	/// The counter that assigns unique id-s to route alternatives
 	unsigned nextRouteAlternativeId = 0U;
 
 	/// All known routes with all their alternatives
@@ -104,25 +106,25 @@ struct JsonSource::DataManager {
 	}
 
 	/// Extracts the stops and the distance between each consecutive ones
-	void extractStopsAndDistances(const ptree &tree, RoutesBundle &rb) {
-		assert(rb.stopsCount() == 0ULL);
+	void extractStopsAndDistances(const ptree &tree, RouteSharedInfo &rsi) {
+		assert(rsi.stopsCount() == 0ULL);
 		unsigned placeId = tree.get<unsigned>("StartPlaceId");
-		rb.setFirstPlace(placeId);
-		bundlesForPlace[placeId].insert(rb.id());
+		rsi.setFirstPlace(placeId);
+		routesForPlace[placeId].insert(rsi.id());
 		for(const auto &nextStopSubtree : tree.get_child("Links")) {
 			const auto &nextStopAndDist = nextStopSubtree.second;
 			placeId = nextStopAndDist.get<unsigned>("NextPlaceId");
 			const float dist = nextStopAndDist.get<float>("dist");
-			rb.setNextStop(placeId, dist);
-			bundlesForPlace[placeId].insert(rb.id());
+			rsi.setNextStop(placeId, dist);
+			routesForPlace[placeId].insert(rsi.id());
 		}
-		assert(rb.stopsCount() >= 2ULL);
+		assert(rsi.stopsCount() >= 2ULL);
 	}
 
 	/// Gets the timetable and other details about each alternative of the given route
 	/// No route alternative is an accepted case!
 	void extractRouteAlternatives(const ptree &alternativesTree,
-								  RoutesBundle &rb) {
+								  RouteSharedInfo &rsi) {
 		for(const auto &alternativeInfoSubtree : alternativesTree) {
 			const auto &alternativeInfo = alternativeInfoSubtree.second;
 			const unsigned esa = alternativeInfo.get<unsigned>("ESA");
@@ -134,7 +136,7 @@ struct JsonSource::DataManager {
 			RouteAlternative &ra = transpAlternatives.emplace(
 				make_pair(nextRouteAlternativeId,
 						  RouteAlternative(nextRouteAlternativeId,
-										   rb, esa, bsa,
+										   rsi, esa, bsa,
 										   timetable,
 										   returnTrip))).first->second;
 
@@ -143,48 +145,50 @@ struct JsonSource::DataManager {
 			const auto udya = alternativeInfo.get_optional<string>("UDYA");
 			if(udya) ra.updateUnavailDaysForTheYearAhead(*udya);
 
-			rb.addAlternative(ra.id());
+			rsi.addAlternative(ra.id());
 			++nextRouteAlternativeId;
 		}
 	}
 
 	/// Extracts the routes (Mandatory section). No routes is allowed!
 	void extractRoutes(const ptree &tree) {
-		for(const auto &bundleSubtree : tree.get_child("Scenario.Routes")) {
-			const auto &bundle = bundleSubtree.second;
-			const unsigned bundleId = bundle.get<unsigned>("bundleId");
+		for(const auto &routesSubtree : tree.get_child("Scenario.Routes")) {
+			const auto &rsiProvider = routesSubtree.second;
+			const unsigned routeSharedInfoId = rsiProvider.get<unsigned>("RouteId");
 
-			const auto it = bundleById.find(bundleId);
-			if(cend(bundleById) != it) {
+			const auto it = rsiById.find(routeSharedInfoId);
+			if(cend(rsiById) != it) {
 				ostringstream oss;
-				oss<<__FUNCTION__ " detected 2 bundles with same id: "<<bundleId;
+				oss<<__FUNCTION__ " detected 2 routes with same id: "<<routeSharedInfoId;
 				throw domain_error(oss.str());
 			}
 
 			const size_t transpMode = TranspModes::fromString(
-				bundle.get<string>("TM").c_str());
+				rsiProvider.get<string>("TM").c_str());
 
-			// The ticket price rules for all routes within this bundle
+			// The ticket price rules for all route alternatives of this route
 			unique_ptr<ITicketPriceCalculator> pricingEng =
 				make_unique<TicketPriceCalculator>(
-					bundle.get<float>("EF"),
-					bundle.get_optional<float>("BF").get_value_or(0.f),
-					bundle.get_optional<float>("LFF").get_value_or(1.f),
-					bundle.get_optional<float>("HFF").get_value_or(1.f));
+					rsiProvider.get<float>("EF"),
+					rsiProvider.get_optional<float>("BF").get_value_or(0.f),
+					rsiProvider.get_optional<float>("LFF").get_value_or(1.f),
+					rsiProvider.get_optional<float>("HFF").get_value_or(1.f));
 
-			const string odw = bundle.get_optional<string>("ODW").get_value_or("1111111");
+			const string odw = rsiProvider.get_optional<string>("ODW").
+				get_value_or("1111111");
 
-			RoutesBundle &rb = bundleById.emplace(
-				make_pair(bundleId, RoutesBundle(bundleId,
-												transpMode,
-												move(pricingEng),
-												odw))).first->second;
+			const string udya = rsiProvider.get_optional<string>("UDYA").
+				get_value_or("");
+			RouteSharedInfo &rsi = rsiById.emplace(
+				make_pair(routeSharedInfoId, RouteSharedInfo(routeSharedInfoId,
+															 transpMode,
+															 move(pricingEng),
+															 udya,
+															 odw))).
+				first->second;
 
-			rb.updateUnavailDaysForTheYearAhead(
-				bundle.get_optional<string>("UDYA").get_value_or(""));
-
-			extractStopsAndDistances(bundle.get_child("Route"), rb);
-			extractRouteAlternatives(bundle.get_child("Alternatives"), rb);
+			extractStopsAndDistances(rsiProvider.get_child("Route"), rsi);
+			extractRouteAlternatives(rsiProvider.get_child("Alternatives"), rsi);
 		}
 	}
 };
@@ -242,44 +246,44 @@ IfPlace& JsonSource::getPlace(const IfUniquePlace &uniquePlaceTraits) const {
 	throw invalid_argument(oss.str());
 }
 
-void JsonSource::bundlesForPlace(unsigned placeId,
-								 set<unsigned> &bundleIds) const {
+void JsonSource::routesForPlace(unsigned placeId,
+								set<unsigned> &routeSharedInfoIds) const {
 	IfPlace &p = getPlace(placeId);
-	const auto it = dm->bundlesForPlace.find(placeId);
-	if(cend(dm->bundlesForPlace) == it) {
+	const auto it = dm->routesForPlace.find(placeId);
+	if(cend(dm->routesForPlace) == it) {
 		ostringstream oss;
-		oss<<__FUNCTION__ " couldn't find any bundle for "<<p.toString();
+		oss<<__FUNCTION__ " couldn't find any route for "<<p.toString();
 		throw domain_error(oss.str());
 	}
 
-	bundleIds = it->second;
+	routeSharedInfoIds = it->second;
 }
 
-void JsonSource::bundlesForPlaces(const set<unsigned> &placeIds,
-								  set<unsigned> &bundleIds) const {
-	bundleIds.clear();
+void JsonSource::routesForPlaces(const set<unsigned> &placeIds,
+								 set<unsigned> &routeSharedInfoIds) const {
+	routeSharedInfoIds.clear();
 	for(const unsigned placeId : placeIds) {
-		set<unsigned> bundlesForNewPlace, temp;
-		bundlesForPlace(placeId, bundlesForNewPlace);
-		set_union(CBOUNDS(bundlesForNewPlace),
-				  CBOUNDS(bundleIds),
+		set<unsigned> routesForNewPlace, temp;
+		routesForPlace(placeId, routesForNewPlace);
+		set_union(CBOUNDS(routesForNewPlace),
+				  CBOUNDS(routeSharedInfoIds),
 				  inserter(temp, begin(temp)));
-		bundleIds = move(temp);
+		routeSharedInfoIds = move(temp);
 	}
 }
 
-IRoutesBundle& JsonSource::getRoutesBundle(unsigned bundleId) const {
-	const auto it = dm->bundleById.find(bundleId);
-	if(cend(dm->bundleById) == it) {
+IRouteSharedInfo& JsonSource::routeSharedInfo(unsigned routeSharedInfoId) const {
+	const auto it = dm->rsiById.find(routeSharedInfoId);
+	if(cend(dm->rsiById) == it) {
 		ostringstream oss;
-		oss<<__FUNCTION__ " couldn't find any bundle with id "<<bundleId;
+		oss<<__FUNCTION__ " couldn't find any route with id "<<routeSharedInfoId;
 		throw domain_error(oss.str());
 	}
 
 	return it->second;
 }
 
-IRouteAlternative& JsonSource::getRouteAlternative(unsigned raId) const {
+IRouteAlternative& JsonSource::routeAlternative(unsigned raId) const {
 	const auto it = dm->transpAlternatives.find(raId);
 	if(cend(dm->transpAlternatives) == it) {
 		ostringstream oss;

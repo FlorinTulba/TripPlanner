@@ -110,8 +110,9 @@
     <ClInclude Include="src\resultsBase.h" />
     <ClInclude Include="src\routeAlternative.h" />
     <ClInclude Include="src\routeAlternativeBase.h" />
-    <ClInclude Include="src\routesBundle.h" />
-    <ClInclude Include="src\routesBundleBase.h" />
+    <ClInclude Include="src\routeCustomizableInfoBase.h" />
+    <ClInclude Include="src\routeSharedInfo.h" />
+    <ClInclude Include="src\routeSharedInfoBase.h" />
     <ClInclude Include="src\transpModes.h" />
     <ClInclude Include="src\util.h" />
     <ClInclude Include="src\variant.h" />
@@ -133,7 +134,7 @@
     <ClCompile Include="src\pricing.cpp" />
     <ClCompile Include="src\results.cpp" />
     <ClCompile Include="src\routeAlternative.cpp" />
-    <ClCompile Include="src\routesBundle.cpp" />
+    <ClCompile Include="src\routeSharedInfo.cpp" />
     <ClCompile Include="src\transpModes.cpp" />
     <ClCompile Include="src\util.cpp" />
     <ClCompile Include="src\variant.cpp" />

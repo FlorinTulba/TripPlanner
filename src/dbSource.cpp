@@ -37,20 +37,20 @@ IfPlace& DbSource::getPlace(const IfUniquePlace &uniquePlaceTraits) const {
 	throw exception("");
 }
 
-void DbSource::bundlesForPlace(unsigned placeId,
-							   set<unsigned> &bundleIds) const {
+void DbSource::routesForPlace(unsigned placeId,
+							  set<unsigned> &routeSharedInfoIds) const {
 	throw exception("");
 }
 
-void DbSource::bundlesForPlaces(const set<unsigned> &placeIds,
-								set<unsigned> &bundleIds) const {
+void DbSource::routesForPlaces(const set<unsigned> &placeIds,
+							   set<unsigned> &routeSharedInfoIds) const {
 	throw exception("");
 }
 
-IRoutesBundle& DbSource::getRoutesBundle(unsigned bundleId) const {
+IRouteSharedInfo& DbSource::routeSharedInfo(unsigned routeSharedInfoId) const {
 	throw exception("");
 }
 
-IRouteAlternative& DbSource::getRouteAlternative(unsigned raId) const {
+IRouteAlternative& DbSource::routeAlternative(unsigned raId) const {
 	throw exception("");
 }

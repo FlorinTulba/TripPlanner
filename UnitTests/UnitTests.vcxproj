@@ -97,7 +97,7 @@
     <ClCompile Include="..\src\pricing.cpp" />
     <ClCompile Include="..\src\results.cpp" />
     <ClCompile Include="..\src\routeAlternative.cpp" />
-    <ClCompile Include="..\src\routesBundle.cpp" />
+    <ClCompile Include="..\src\routeSharedInfo.cpp" />
     <ClCompile Include="..\src\transpModes.cpp" />
     <ClCompile Include="..\src\util.cpp" />
     <ClCompile Include="..\src\variant.cpp" />
@@ -123,23 +123,6 @@
     <None Include="TestFiles\credentialsNotOk.bin" />
     <None Include="TestFiles\credentialsOk.bin" />
     <None Include="TestFiles\specsOk.json" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\src\connection.h" />
-    <ClInclude Include="..\src\constraints.h" />
-    <ClInclude Include="..\src\credentialsProvider.h" />
-    <ClInclude Include="..\src\customDateTimeProcessor.h" />
-    <ClInclude Include="..\src\dbSource.h" />
-    <ClInclude Include="..\src\jsonSource.h" />
-    <ClInclude Include="..\src\planner.h" />
-    <ClInclude Include="..\src\pricing.h" />
-    <ClInclude Include="..\src\results.h" />
-    <ClInclude Include="..\src\routeAlternative.h" />
-    <ClInclude Include="..\src\routesBundle.h" />
-    <ClInclude Include="..\src\transpModes.h" />
-    <ClInclude Include="..\src\util.h" />
-    <ClInclude Include="..\src\variant.h" />
-    <ClInclude Include="..\src\variants.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

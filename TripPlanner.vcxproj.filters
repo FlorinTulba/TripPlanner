@@ -117,13 +117,16 @@
     <ClInclude Include="src\routeAlternative.h">
       <Filter>Header Files\Specs</Filter>
     </ClInclude>
-    <ClInclude Include="src\routesBundleBase.h">
-      <Filter>Header Files\Specs</Filter>
-    </ClInclude>
-    <ClInclude Include="src\routesBundle.h">
-      <Filter>Header Files\Specs</Filter>
-    </ClInclude>
     <ClInclude Include="src\transpModes.h">
+      <Filter>Header Files\Specs</Filter>
+    </ClInclude>
+    <ClInclude Include="src\routeSharedInfoBase.h">
+      <Filter>Header Files\Specs</Filter>
+    </ClInclude>
+    <ClInclude Include="src\routeSharedInfo.h">
+      <Filter>Header Files\Specs</Filter>
+    </ClInclude>
+    <ClInclude Include="src\routeCustomizableInfoBase.h">
       <Filter>Header Files\Specs</Filter>
     </ClInclude>
   </ItemGroup>
@@ -176,10 +179,10 @@
     <ClCompile Include="src\routeAlternative.cpp">
       <Filter>Source Files\Specs</Filter>
     </ClCompile>
-    <ClCompile Include="src\routesBundle.cpp">
+    <ClCompile Include="src\transpModes.cpp">
       <Filter>Source Files\Specs</Filter>
     </ClCompile>
-    <ClCompile Include="src\transpModes.cpp">
+    <ClCompile Include="src\routeSharedInfo.cpp">
       <Filter>Source Files\Specs</Filter>
     </ClCompile>
   </ItemGroup>

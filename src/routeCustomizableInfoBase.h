@@ -24,28 +24,21 @@
 
 #pragma once
 
-#include "routeCustomizableInfoBase.h"
-#include "routeSharedInfoBase.h"
+#include <set>
+#include <bitset>
+#include <memory>
 
-/// Provides specific information about an alternative for a given route
-struct IRouteAlternative : IRouteCustomizableInfo {
-	virtual unsigned id() const = 0;	///< unique id
+#include <boost/date_time/gregorian/greg_date.hpp>
+#include <boost/date_time/posix_time/time_period.hpp>
 
-	/// The route shared information relevant for this alternative
-	virtual const IRouteSharedInfo& routeSharedInfo() const = 0;
+ /// Provides specific information about an alternative for a given route
+struct IRouteCustomizableInfo abstract {
+	virtual ~IRouteCustomizableInfo() = 0 {}
 
-	virtual bool returnTrip() const = 0;	///< represents a return trip
+	/// Operational days of a week
+	virtual std::shared_ptr<std::bitset<7>> operationalDaysOfWeek() const = 0;
 
-	/// capacity of economy class seats
-	virtual unsigned economySeatsCapacity() const = 0;
-
-	/// capacity of business class seats
-	virtual unsigned businessSeatsCapacity() const = 0;
-
-	/**
-	The timetable for this alternative of the route.
-	These times are always traversed and kept in the forward direction,
-	even for return trips.
-	*/
-	virtual const std::vector<boost::posix_time::time_period>& timetable() const = 0;
+	/// The days from the year ahead when this transport is not available
+	virtual std::shared_ptr<std::set<boost::gregorian::date>>
+		unavailDaysForTheYearAhead() const = 0;
 };

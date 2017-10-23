@@ -25,7 +25,7 @@
 #pragma once
 
 #include "placeBase.h"
-#include "routesBundleBase.h"
+#include "routeSharedInfoBase.h"
 #include "routeAlternativeBase.h"
 
 #include <set>
@@ -50,16 +50,16 @@ struct InfoSource abstract {
 	*/
 	virtual IfPlace& getPlace(const IfUniquePlace &uniquePlaceTraits) const = 0;
 
-	/// Finds the route bundles covering the location with placeId
-	virtual void bundlesForPlace(unsigned placeId, std::set<unsigned> &bundleIds) const = 0;
+	/// Finds the routes covering the location with placeId
+	virtual void routesForPlace(unsigned placeId, std::set<unsigned> &routeSharedInfoIds) const = 0;
 
-	/// Finds the route bundles covering the locations with placeIds
-	virtual void bundlesForPlaces(const std::set<unsigned> &placeIds,
-								  std::set<unsigned> &bundleIds) const = 0;
+	/// Finds the routes covering the locations with placeIds
+	virtual void routesForPlaces(const std::set<unsigned> &placeIds,
+								 std::set<unsigned> &routeSharedInfoIds) const = 0;
 
-	/// @return the bundle with the given id
-	virtual IRoutesBundle& getRoutesBundle(unsigned bundleId) const = 0;
+	/// @return the route shared information with the given id
+	virtual IRouteSharedInfo& routeSharedInfo(unsigned routeSharedInfoId) const = 0;
 
 	/// @return the route alternative with the given id
-	virtual IRouteAlternative& getRouteAlternative(unsigned raId) const = 0;
+	virtual IRouteAlternative& routeAlternative(unsigned raId) const = 0;
 };

@@ -25,7 +25,7 @@
 
 "-- Comment --": [
 	"== Data for Routes ==",
-	" * Unique bundleId",
+	" * Unique RouteId",
 	" * The transport mode (TM): Air/Rail/Road/Water",
 	" * Operational days of the week (ODW) - optional",
 	"   as bit string for Sun-Mon-Tue-Wed-Thu-Fri-Sat.",
@@ -52,7 +52,7 @@
 	"       - exceptions, if any from ODW and UDYA"
 ],
 "Routes": [
-	{"bundleId":1, "TM" : "Road", "ODW" : "0111110",
+	{"RouteId":1, "TM" : "Road", "ODW" : "0111110",
 	"UDYA" : "Jan-1|Jan-2|Jan-3|Apr-4|July-4|Jul-14|Dec-25|Dec-31",
 	"EF" : 3.5,
 	"Route" : {"StartPlaceId":1, "Links": [
@@ -68,8 +68,9 @@
 		{"ESA" : 50, "TT":
 		"10:0-11:30|11:40-13:0|13:15-15:0|15:15-17:45|18:15-22:30"},
 		
-		{"ESA" : 50, "UDYA" : "Jan-1 Jan-2 31.12", "TT":
-		"13:0-15:0|15:10-19:0|19:15-20:40|21:0-24:0|24:15-28:0"},
+		{"ESA" : 50, "TT":
+		"13:0-15:0|15:10-19:0|19:15-20:40|21:0-24:0|24:15-28:0",
+        "UDYA" : "Jan-1|Jan-2|Jan-3|Apr-4|July-4|Jul-14|Oct-4|Dec-25|Dec-31"},
 		
 		{"ESA" : 50, "TT":
 		"18:0-19:30|19:40-20:15|20:30-22:0|22:15-26:30|26:45-29:30"},
@@ -78,7 +79,9 @@
 		"21:0-25:0|25:30-27:45|28:0-29:30|29:45-30:50|31:0-32:30"},
 		
 		{"ESA" : 50, "ReturnTrip" : true, "TT":
-		"0:30-4:30|5:0-7:15|7:30-9:0|9:15-10:20|10:30-12:0"},
+		"0:30-4:30|5:0-7:15|7:30-9:0|9:15-10:20|10:30-12:0",
+        "ODW" : "0100000",
+        "UDYA" : "Jan-1|Jan-2|Jan-3|Mar-7|Apr-4|July-4|Jul-14|Dec-25|Dec-31"},
 		
 		{"ESA" : 50, "ReturnTrip" : true, "TT":
 		"6:0-10:0|10:15-12:30|12:45-14:15|14:30-15:35|15:45-17:15"},
@@ -87,7 +90,7 @@
 		"7:30-11:30|12:0-14:15|14:30-16:0|16:15-17:20|17:30-19:0"}
 	]},
 
-	{"bundleId":2, "TM" : "Rail", "ODW" : "1111111",
+	{"RouteId":2, "TM" : "Rail", "ODW" : "1111111",
 	"UDYA" : "Jan-1|Jan-2|Jan-3|Apr-4|July-4|Jul-14|Dec-25|Dec-31",
 	"EF" : 4, "BF" : 6,
 	"Route" : {"StartPlaceId":1, "Links": [
@@ -99,14 +102,15 @@
 			{"NextPlaceId":12, "dist" : 49.1},
 			{"NextPlaceId":13, "dist" : 30.3}]},
 	"Alternatives" : [
-		{"ESA" : 800, "BSA" : 50, "ODW" : "0111110", "TT":
-		"5:10-5:45|5:53-7:20|7:35-8:5|8:16-10:20|10:25-10:35|10:40-11:20|11:30-11:55"},
+		{"ESA" : 800, "BSA" : 50, "TT":
+		"5:10-5:45|5:53-7:20|7:35-8:5|8:16-10:20|10:25-10:35|10:40-11:20|11:30-11:55",
+        "ODW" : "0111110"},
 		
 		{"ESA" : 800, "BSA" : 50, "ReturnTrip" : true, "TT":
 		"13:0-13:30|13:40-14:20|14:25-14:35|14:40-16:35|16:46-17:15|17:30-19:0|19:10-19:45"}
 	]},
 
-	{"bundleId":3, "TM" : "Water", "ODW" : "0101010",
+	{"RouteId":3, "TM" : "Water", "ODW" : "0101010",
 	"UDYA" : "Jan-1|Jan-2|Jan-3|Apr-4|July-4|Jul-14|Dec-25|Dec-31",
 	"EF" : 2.5, "BF" : 4,
 	"Route" : {"StartPlaceId":1, "Links": [
@@ -120,7 +124,7 @@
 		"9:0-10:0|10:30-12:30"}
 	]},
 
-	{"bundleId":4, "TM" : "Air",
+	{"RouteId":4, "TM" : "Air",
 	"UDYA" : "Jan-1|Jan-2|Dec-31",
 	"EF" : 5, "BF" : 9, "LFF" : 0.4, "HFF" : 3.5,
 	"Route" : {"StartPlaceId":14, "Links": [

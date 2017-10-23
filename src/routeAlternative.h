@@ -25,13 +25,13 @@
 #pragma once
 
 #include "routeAlternativeBase.h"
-#include "routesBundleBase.h"
+#include "routeSharedInfoBase.h"
 
  /// Provides specific information about an alternative for a given route
 class RouteAlternative : public IRouteAlternative {
 protected:
-	/// Routes bundle with common information relevant for this alternative
-	IRoutesBundle &_rb;
+	/// Route shared information relevant for this alternative
+	IRouteSharedInfo &_rsi;
 
 	/// Operational days of a week
 	std::shared_ptr<std::bitset<7>> odw;
@@ -51,21 +51,21 @@ public:
 	Builds an alternative of a route by setting its critical data:
 
 	@param id_ unique id
-	@param rb routes bundle with common information relevant for this alternative
+	@param rsi route shared information relevant for this alternative
 	@param esa_ capacity of economy class seats
 	@param bsa_ capacity of business class seats
 	@param timetable_ the stops schedule for this alternative of the route
 	@param returnTrip_ states whether this is a return trip or not
 	*/
-	RouteAlternative(unsigned id_, IRoutesBundle &rb, unsigned esa_, unsigned bsa_,
+	RouteAlternative(unsigned id_, IRouteSharedInfo &rsi, unsigned esa_, unsigned bsa_,
 					 const std::string &timetable_, bool returnTrip_);
 
 	// Getter methods
 
 	unsigned id() const override; ///< unique id
 
-	/// Id of the routes bundle with common information relevant for this alternative
-	unsigned bundleId() const override;
+	/// The route shared information relevant for this alternative
+	const IRouteSharedInfo& routeSharedInfo() const override;
 
 	bool returnTrip() const override;	///< represents a return trip
 
@@ -82,7 +82,11 @@ public:
 	/// capacity of business class seats
 	unsigned businessSeatsCapacity() const override;
 
-	/// The timetable for this alternative of the route
+	/**
+	The timetable for this alternative of the route.
+	These times are always traversed and kept in the forward direction,
+	even for return trips.
+	*/
 	const std::vector<boost::posix_time::time_period>& timetable() const override;
 
 	// Modifiers below
