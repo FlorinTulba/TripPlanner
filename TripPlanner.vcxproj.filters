@@ -46,6 +46,11 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="TripPlanner.licenseheader" />
+    <None Include="ReadMe.md" />
+    <None Include="Makefile" />
+    <None Include="input.json">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\util.h">
@@ -185,5 +190,8 @@
     <ClCompile Include="src\routeSharedInfo.cpp">
       <Filter>Source Files\Specs</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="agpl-3.0.txt" />
   </ItemGroup>
 </Project>
