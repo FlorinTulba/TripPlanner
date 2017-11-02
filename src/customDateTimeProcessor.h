@@ -22,51 +22,69 @@
  If not, see <http://www.gnu.org/licenses/agpl-3.0.txt>.
  *****************************************************************************/
 
-#pragma once
+#ifndef H_CUSTOM_DATE_TIME_PROCESSOR
+#define H_CUSTOM_DATE_TIME_PROCESSOR
+
+#pragma warning ( push, 0 )
 
 #include <string>
 #include <vector>
 #include <set>
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wignored-attributes"
+
 #include <boost/date_time/posix_time/ptime.hpp>
 
-/**
-Returns the current moment in UTC.
+#pragma clang diagnostic pop
+#pragma warning ( pop )
 
-If necessary, it should be able to provide a sequence of constants,
-instead of the actual current moment. See the nowReplacements from below.
+// namespace trip planner - various
+namespace tp { inline namespace var {
 
-Various scenarios might need reusing specific moments in time,
-to investigate or check the behavior of the system.
+  /**
+  Returns the current moment in UTC.
 
-This mechanism allows going into the past / future, particularly in Unit tests.
-*/
-boost::posix_time::ptime nowUTC();
+  If necessary, it should be able to provide a sequence of constants,
+  instead of the actual current moment. See the nowReplacements from below.
 
-// Let just 1 unit instantiate this template used below
-extern template std::vector<boost::posix_time::ptime>;
+  Various scenarios might need reusing specific moments in time,
+  to investigate or check the behavior of the system.
 
-/**
-Allows using the values from this container
-instead of actually reading the current moment.
+  This mechanism allows going into the past / future, particularly in Unit tests.
+  */
+  boost::posix_time::ptime nowUTC();
 
-The values to be reported are always read from the back of the vector.
-Between consecutive read operations, the vector can be updated
-dynamically in any way.
-*/
-extern std::vector<boost::posix_time::ptime> nowReplacements;
+#if (defined(_MSC_VER) || defined(__clang__)) && !defined(__GNUC__)
+  // Let just 1 unit instantiate this template used below
+  extern template std::vector<boost::posix_time::ptime>;
+#endif // (_MSC_VER || __clang__) && !__GNUC__
 
-/// Converting a moment object to string: "shortDayName shortMonthName-day-year hours:minutes"
-std::string formatTimePoint(const boost::posix_time::ptime &mom);
+  /**
+  Allows using the values from this container
+  instead of actually reading the current moment.
 
-/// Converting a duration object to string: [[DDD day[s], ]H hour[s] and ]M minute[s]
-std::string formatDuration(const boost::posix_time::time_duration &dur);
+  The values to be reported are always read from the back of the vector.
+  Between consecutive read operations, the vector can be updated
+  dynamically in any way.
+  */
+  extern std::vector<boost::posix_time::ptime> nowReplacements;
 
-/**
-Replacing the content of udyaSet with the dates from udyaStr.
-The dates are delimited by '|' among 0 or more space-like symbols.
-The dates referring to months before current month actually point to
-those months from the next year.
-*/
-void updateUnavailDaysForTheYearAhead(const std::string &udyaStr,
-									  std::set<boost::gregorian::date> &udyaSet);
+  /// Converting a moment object to string: "shortDayName shortMonthName-day-year hours:minutes"
+  std::string formatTimePoint(const boost::posix_time::ptime &mom);
+
+  /// Converting a duration object to string: [[DDD day[s], ]H hour[s] and ]M minute[s]
+  std::string formatDuration(const boost::posix_time::time_duration &dur);
+
+  /**
+  Replacing the content of udyaSet with the dates from udyaStr.
+  The dates are delimited by '|' among 0 or more space-like symbols.
+  The dates referring to months before current month actually point to
+  those months from the next year.
+  */
+  void updateUnavailDaysForTheYearAhead(const std::string &udyaStr,
+                                        std::set<boost::gregorian::date> &udyaSet);
+
+}} // namespace tp::var
+
+#endif // H_CUSTOM_DATE_TIME_PROCESSOR

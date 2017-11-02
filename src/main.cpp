@@ -23,14 +23,38 @@
  *****************************************************************************/
 
 #include "planner.h"
+#include "jsonSource.h"
 
 using namespace std;
+using namespace boost::filesystem;
+using namespace tp;
+using namespace tp::specs;
+using namespace tp::queries;
 
-void main(/*int argc, const char* argv[]*/) {
-	TripPlanner tp("dataPath");
-	const unique_ptr<IResults> results = tp.search("abc", "def", 10ULL);
-	if(nullptr == results)
-		cout<<"There were no results!"<<endl;
-	else
-		cout<<*results<<endl;
+int main(/*int argc, const char* argv[]*/) {
+  /*
+  cout<<"Initial locale: "<<setlocale(LC_ALL, nullptr)<<endl;
+  cout<<"Setting locale: "<<setlocale(LC_ALL, "utf-8")<<endl;
+  cin.imbue(locale()); cout.imbue(locale());
+  */
+  TripPlanner tp(make_unique<JsonSource>(path("input.json")));
+  string from, to;
+  for(;;) {
+    try {
+      cout<<"Enter the name of the departure place: ";
+      if(!getline(cin, from))break;
+      cout<<"Enter the destination name: ";
+      if(!getline(cin, to))break;
+      tp.search(from, to, 4ULL);
+    } catch(exception &e) {
+      cerr<<e.what()<<endl;
+    }
+  }
+  /*
+  const unique_ptr<IResults> results = tp.search("pp", "p13", 4ULL);
+  if(nullptr == results)
+  cout<<"There were no results!"<<endl;
+  else
+  cout<<*results<<endl;
+  */
 }

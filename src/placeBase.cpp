@@ -24,22 +24,25 @@
 
 #include "placeBase.h"
 
-#include <sstream>
-
 using namespace std;
 
- bool IfUniquePlace::operator<(const IfUniquePlace &rhs) const {
-	 return name().compare(rhs.name()) < 0;
- }
+// namespace trip planner - specifications
+namespace tp { namespace specs {
 
- string IfUniquePlace::toString() const {
-	ostringstream oss;
-	oss<<"Unique place traits: name='"<<name()<<'\'';
-	return oss.str();
-}
+#if (defined(_MSC_VER) || defined(__clang__)) && !defined(__GNUC__)
+  template GpsCoord<float>;
+  template GpsCoord<double>;
+  template GpsCoord<long double>;
+#endif // (_MSC_VER || __clang__) && !__GNUC__
 
-string IfPlace::toString() const {
-	ostringstream oss;
-	oss<<"Place{ id="<<id()<<"; name='"<<name()<<"' }";
-	return oss.str();
-}
+  string IfPlace::toString() const {
+	  ostringstream oss; // showing the most well known name
+    oss<<"Place{ id="<<id()<<"; name='"<<names().front()<<'\'';
+    const string &descr = shortDescr();
+    if(!descr.empty())
+      oss<<" - "<<descr; 
+    oss<<", gps="<<gpsCoord().toString(true)<<" }"; // in degrees
+	  return oss.str();
+  }
+
+}} // namespace tp::specs

@@ -27,85 +27,99 @@
 #include "transpModes.h"
 #include "util.h"
 
+#pragma warning ( push, 0 )
+
 #include <cassert>
 #include <numeric>
+
+#pragma warning ( pop )
 
 using namespace std;
 using namespace boost::posix_time;
 
-void Variant::appendConnection(std::unique_ptr<IConnection> conn) {
-	if(nullptr == conn)
-		throw invalid_argument(__FUNCTION__ " expect non-null conn parameter!");
+// namespace trip planner - queries
+namespace tp { namespace queries {
 
-	if(!conns.empty()) {
-		const IConnection *prev = conns.back().get();
-		assert(prev != nullptr);
-		if(conn->from() != prev->to() || conn->begin() <= prev->end())
-			throw invalid_argument(__FUNCTION__
-								   " needs a conn that binds to the previous last location"
-								   " and only after the arrival at that last location!");
-	}
+  void Variant::appendConnection(std::unique_ptr<IConnection> conn) {
+	  if(nullptr == conn)
+		  throw invalid_argument(string(__func__) +
+                             " expect non-null conn parameter!");
 
-	conns.push_back(move(conn));
-}
+	  if(!conns.empty()) {
+		  const IConnection *prev = conns.back().get();
+		  assert(prev != nullptr);
+		  if(conn->from() != prev->to() || conn->begin() <= prev->end())
+			  throw invalid_argument(string(__func__) +
+                               " needs a conn that binds to the previous last "
+                               "location and only after the arrival at that "
+                               "last location!");
+	  }
 
-const vector<unique_ptr<IConnection>>& Variant::connections() const {
-	return conns;
-}
+	  conns.push_back(move(conn));
+  }
 
-ptime Variant::begin() const {
-	assert(!conns.empty() && conns.back());
-	return conns.front()->begin();
-}
+  const vector<unique_ptr<IConnection>>& Variant::connections() const {
+	  return conns;
+  }
 
-ptime Variant::end() const {
-	assert(!conns.empty() && conns.back());
-	return conns.back()->end();
-}
+  ptime Variant::begin() const {
+	  assert(!conns.empty() && conns.back());
+	  return conns.front()->begin();
+  }
 
-time_duration Variant::duration() const {
-	return end() - begin();
-}
+  ptime Variant::end() const {
+	  assert(!conns.empty() && conns.back());
+	  return conns.back()->end();
+  }
 
-size_t Variant::from() const {
-	assert(!conns.empty() && conns.front());
-	return conns.front()->from();
-}
+  time_duration Variant::duration() const {
+	  return end() - begin();
+  }
 
-size_t Variant::to() const {
-	assert(!conns.empty() && conns.back());
-	return conns.back()->to();
-}
+  size_t Variant::from() const {
+	  assert(!conns.empty() && conns.front());
+	  return conns.front()->from();
+  }
 
-float Variant::price() const {
-	return accumulate(CBOUNDS(conns), 0.f,
-					  [] (float prevSum,
-						  const unique_ptr<IConnection> &c) {
-		assert(c);
-		return prevSum + c->price();
-	});
-}
+  size_t Variant::to() const {
+	  assert(!conns.empty() && conns.back());
+	  return conns.back()->to();
+  }
 
-float Variant::distance() const {
-	return accumulate(CBOUNDS(conns), 0.f,
-					  [] (float prevSum,
-						  const unique_ptr<IConnection> &c) {
-		assert(c);
-		return prevSum + c->distance();
-	});
-}
+  float Variant::price() const {
+	  return accumulate(CBOUNDS(conns), 0.f,
+					    [] (float prevSum,
+						    const unique_ptr<IConnection> &c) {
+		  assert(c);
+		  return prevSum + c->price();
+	  });
+  }
 
-size_t Variant::transpModes() const {
-	size_t result = 0ULL;
-	for(const unique_ptr<IConnection> &c : conns) {
-		assert(c);
-		result = result | c->transpModes();
-	}
-	return result;
-}
+  float Variant::distance() const {
+	  return accumulate(CBOUNDS(conns), 0.f,
+					    [] (float prevSum,
+						    const unique_ptr<IConnection> &c) {
+		  assert(c);
+		  return prevSum + c->distance();
+	  });
+  }
 
-ostream& operator<<(ostream &os, const IVariant &variant) {
-	const vector<unique_ptr<IConnection>> &conns = variant.connections();
+  size_t Variant::transpModes() const {
+	  size_t result = 0ULL;
+	  for(const unique_ptr<IConnection> &c : conns) {
+		  assert(c);
+		  result = result | c->transpModes();
+	  }
+	  return result;
+  }
+
+}} // namespace tp::queries
+
+ostream& operator<<(ostream &os, const tp::queries::IVariant &variant) {
+  using namespace tp::specs;
+  using namespace tp::queries;
+  using namespace tp::var;
+  const vector<unique_ptr<IConnection>> &conns = variant.connections();
 	const size_t count = conns.size();
 	os<<"Summary: "
 		<<variant.from()<<" ["<<formatTimePoint(variant.begin())<<" - "

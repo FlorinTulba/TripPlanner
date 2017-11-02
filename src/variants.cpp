@@ -24,24 +24,34 @@
 
 #include "variants.h"
 
+#pragma warning ( push, 0 )
+
 #include <stdexcept>
 #include <cassert>
 
+#pragma warning ( pop )
+
 using namespace std;
 
-void Variants::add(std::unique_ptr<IVariant> variant) {
-	if(nullptr == variant)
-		throw invalid_argument(__FUNCTION__ " expect non-null variant parameter!");
+// namespace trip planner - queries
+namespace tp { namespace queries {
 
-	variants.push_back(move(variant));
-}
+  void Variants::add(std::unique_ptr<IVariant> variant) {
+	  if(nullptr == variant)
+		  throw invalid_argument(string(__func__) +
+                             " expect non-null variant parameter!");
 
-const vector<unique_ptr<IVariant>>& Variants::get() const {
-	return variants;
-}
+	  variants.push_back(move(variant));
+  }
 
-ostream& operator<<(ostream &os, const IVariants &variants) {
-	const vector<unique_ptr<IVariant>> &v = variants.get();
+  const vector<unique_ptr<IVariant>>& Variants::get() const {
+	  return variants;
+  }
+
+}} // namespace tp::queries
+
+ostream& operator<<(ostream &os, const tp::queries::IVariants &variants) {
+	const vector<unique_ptr<tp::queries::IVariant>> &v = variants.get();
 	const size_t count = v.size();
 	for(size_t i = 0ULL; i < count; ++i) {
 		assert(v[i]);

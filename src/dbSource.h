@@ -22,44 +22,75 @@
  If not, see <http://www.gnu.org/licenses/agpl-3.0.txt>.
  *****************************************************************************/
 
-#pragma once
+#ifndef H_DB_SOURCE
+#define H_DB_SOURCE
 
 #include "infoSource.h"
 #include "credentialsBase.h"
 
-/// Database provider of input data
-class DbSource : public InfoSource {
-public:
-	/// Ensures the database can be accessed; Throws otherwise
-	DbSource(const std::string &dbUrl, const std::string &dbName,
-			 const IfCredentials &credentialsProvider);
+// namespace trip planner - specifications
+namespace tp { namespace specs {
 
-	/**
-	Looks for the place with the given id.
-	Some places might have been removed, so there could be
-	missing values from the sequence of id-s.
+  /// Database provider of input data
+  class DbSource : public InfoSource {
+  public:
+	  /// Ensures the database can be accessed; Throws otherwise
+	  DbSource(const std::string &dbUrl, const std::string &dbName,
+             const IfCredentials &credentialsProvider);
 
-	@return the place data for the given id
-	@throw invalid_argument if id is not found
-	*/
-	IfPlace& getPlace(unsigned id) const override;
+    /// Allows using the updates from the source
+    void reload() override;
 
-	/**
-	@return the place data for the given uniquePlaceTraits
-	@throw invalid_argument if there is no such place
-	*/
-	IfPlace& getPlace(const IfUniquePlace &uniquePlaceTraits) const override;
+    /// Fills placeIds with the set of id-s of all places from the map
+	  void idsOfAllPlaces(std::vector<unsigned> &placeIds) const override;
 
-	/// Finds the routes covering the location with placeId
-	void routesForPlace(unsigned placeId, std::set<unsigned> &routeSharedInfoIds) const override;
+	  /**
+	  Looks for the place with the given id.
+	  Some places might have been removed, so there could be
+	  missing values from the sequence of id-s.
 
-	/// Finds the routes covering the locations with placeIds
-	void routesForPlaces(const std::set<unsigned> &placeIds,
-						 std::set<unsigned> &routeSharedInfoIds) const override;
+	  @return the place data for the given id
+	  @throw invalid_argument if id is not found
+	  */
+	  const IfPlace& getPlace(unsigned id) const override;
 
-	/// @return the route shared information with the given id
-	IRouteSharedInfo& routeSharedInfo(unsigned routeSharedInfoId) const override;
+    /**
+    @return the place data for the given location
+    @throw invalid_argument if there is no such place
+    */
+    const IfPlace& getPlace(const GpsCoord<float> &gps) const override;
 
-	/// @return the route alternative with the given id
-	IRouteAlternative& routeAlternative(unsigned raId) const override;
-};
+    /**
+    @return the place with given name/alias and short description
+    @throw invalid_argument if there is no such place
+    */
+    const IfPlace& getPlace(const std::string &knownAs,
+                            const std::string &shortDescr = u8"") const override;
+
+    /// Fills places with the pointers to all locations named name
+    /// sorted by the corresponding description of each place
+    void getAllPlacesNamed(const std::string &name,
+                           std::vector<const IfPlace*> &places) const override;
+
+
+    /// Fills routeSharedInfoIds with the sorted set of id-s of all routes from the map
+    void idsOfAllRoutes(std::vector<unsigned> &routeSharedInfoIds) const override;
+    
+    /// Finds the routes covering the location with placeId
+	  void routesForPlace(unsigned placeId,
+                        std::vector<unsigned> &routeSharedInfoIds) const override;
+
+	  /// Finds the routes covering the locations with placeIds
+	  void routesForPlaces(const std::set<unsigned> &placeIds,
+                         std::vector<unsigned> &routeSharedInfoIds) const override;
+
+	  /// @return the route shared information with the given id
+	  IRouteSharedInfo& routeSharedInfo(unsigned routeSharedInfoId) const override;
+
+	  /// @return the route alternative with the given id
+	  IRouteAlternative& routeAlternative(unsigned raId) const override;
+  };
+
+}} // namespace tp::specs
+
+#endif // H_DB_SOURCE

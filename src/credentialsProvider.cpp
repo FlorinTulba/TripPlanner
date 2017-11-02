@@ -24,61 +24,71 @@
 
 #include "credentialsProvider.h"
 
+#pragma warning ( push, 0 )
+
 #include <fstream>
+
+#pragma warning ( pop )
 
 using namespace std;
 using namespace boost::archive;
 
 static void promptStreamExc() {
 	static const char err[] = "Fatal - Invalid prompt stream status / data!";
-	cerr<<err<<endl;
+  cerr<<err<<endl;
 	throw runtime_error(err);
 }
 
-CredentialsProvider::CredentialsProvider(const string &credentialsFile,
-										 istream &promptStream/* = cin*/) {
-	ifstream ifs(credentialsFile, ios::binary);
-	if(ifs) { // read the credentials from the file
-		try {
-			binary_iarchive ia(ifs);
-			ia>>*this;
-			return;
-		} catch(exception &e) {
-			cerr<<"Error - Detected problem while processing the credentials file `"
-				<<credentialsFile<<"`: "<<e.what()<<endl;
-		}
-	} 
+// namespace trip planner - specifications
+namespace tp { namespace specs {
+
+  CredentialsProvider::CredentialsProvider(const string &credentialsFile,
+                                           istream &promptStream/* = cin*/) {
+	  ifstream ifs(credentialsFile, ios::binary);
+	  if(ifs) { // read the credentials from the file
+		  try {
+			  binary_iarchive ia(ifs);
+			  ia>>*this;
+			  return;
+		  } catch(exception &e) {
+			  cerr<<"Error - Detected problem while processing the credentials file `"
+				  <<credentialsFile<<"`: "<<e.what()<<endl;
+		  }
+	  } 
 	
-	// Prompt the user for the credentials
-	cout<<"Please provide the credentials for using the database of this project!"<<endl;
-	for(;;) {
-		cout<<"User=";
-		if(!getline(promptStream, _user))
-			promptStreamExc();
+	  // Prompt the user for the credentials
+	  cout<<"Please provide the credentials for using the database of this project!"
+      <<endl;
+	  for(;;) {
+		  cout<<"User=";
+		  if(!getline(promptStream, _user))
+			  promptStreamExc();
 		
-		if(!_user.empty())
-			break;
-		cerr<<"Error - The username cannot be empty!"<<endl;
-	}
-	cout<<"Password=";
-	if(!getline(promptStream, _password))
-		promptStreamExc();
+		  if(!_user.empty())
+			  break;
+		  cerr<<"Error - The username cannot be empty!"<<endl;
+	  }
+	  cout<<"Password=";
+	  if(!getline(promptStream, _password))
+		  promptStreamExc();
 
-	// Try writing the provided credentials to the file
-	try {
-		ofstream ofs(credentialsFile, ios::binary);
-		binary_oarchive oa(ofs);
-		oa<<*this;
-	} catch(exception &e) {
-		cout<<"Warning - Detected problem while writing the credentials file `"
-			<<credentialsFile<<"`: "<<e.what()<<endl;
-	}
-}
+	  // Try writing the provided credentials to the file
+	  try {
+		  ofstream ofs(credentialsFile, ios::binary);
+		  binary_oarchive oa(ofs);
+		  oa<<*this;
+	  } catch(exception &e) {
+		  cout<<"Warning - Detected problem while writing the credentials file `"
+			  <<credentialsFile<<"`: "<<e.what()<<endl;
+	  }
+  }
 
-const string& CredentialsProvider::user() const {
-	return _user;
-}
+  const string& CredentialsProvider::user() const {
+	  return _user;
+  }
 
-const string& CredentialsProvider::password() const {
-	return _password;
-}
+  const string& CredentialsProvider::password() const {
+	  return _password;
+  }
+
+}} // namespace tp::specs

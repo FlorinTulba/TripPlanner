@@ -1,4 +1,4 @@
-/*****************************************************************************
+﻿/*****************************************************************************
  TripPlanner explores various issues common to navigation and booking systems.
 
  Copyrights from the libraries used by the program:
@@ -26,6 +26,7 @@
 #include "jsonSource.h"
 #include "place.h"
 #include "transpModes.h"
+#include "customDateTimeProcessor.h"
 #include "util.h"
 
 #include <boost/date_time/gregorian/parsers.hpp>
@@ -34,8 +35,9 @@ using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 using namespace std;
 using namespace boost::posix_time;
 using namespace boost::gregorian;
-
-extern vector<ptime> nowReplacements;
+using namespace tp::specs;
+using namespace tp::var;
+using namespace boost::filesystem;
 
 namespace UnitTests {
 	TEST_CLASS(JsonSource) {
@@ -45,35 +47,67 @@ namespace UnitTests {
 
 			try {
 				// Force the test to always run as if on 2017-Jul-10
-				nowReplacements.resize(5ULL, ptime(from_simple_string("2017-Jul-10")));
+				nowReplacements.resize(5ULL, ptime(from_simple_string("2017-Jul-10"s)));
 
-				::JsonSource js("../../UnitTests/TestFiles/specsOk.json");
+        tp::specs::JsonSource js(path("../../UnitTests/TestFiles/specsOk.json"));
 
-				const auto &p4 = js.getPlace(4);
-				Assert::AreEqual("p4", p4.name().c_str());
+				const auto &p4 = js.getPlace(4U);
+        const auto &p4Loc = p4.gpsCoord();
+        Assert::IsTrue(p4.shortDescr().empty());
+        Assert::AreEqual(2ULL, p4.names().size());
+        Assert::AreEqual(u8"∃y ∀x ¬(x ≺ y)"s, p4.names().front());
+        Assert::AreEqual(u8"p4"s, p4.names().back());
+        Assert::AreEqual(45.f, p4Loc.latitude().get(true), 1e-3f);
+        Assert::AreEqual(90.f, p4Loc.longitude().get(true), 1e-3f);
 
-				const auto &p8 = js.getPlace(UniquePlace("p8"));
+				const auto &p8 =
+          js.getPlace(GpsCoord<float>((float) 11.25_deg, (float) 22.5_deg));
 				Assert::AreEqual(8U, p8.id());
+        Assert::IsTrue(p8.shortDescr().empty());
+        Assert::AreEqual(2ULL, p8.names().size());
+        Assert::AreEqual(u8"Приве́т नमस्ते שָׁלוֹם"s, p8.names().front());
+        Assert::AreEqual(u8"p8"s, p8.names().back());
 
-				Assert::ExpectException<invalid_argument>([&js] {
-					js.getPlace(16U); // No such place
-				});
+        Assert::ExpectException<invalid_argument>([&js] {
+          js.getPlace(0U); // No such place
+        });
 
-				Assert::ExpectException<invalid_argument>([&js] {
-					js.getPlace(UniquePlace("p16")); // No such place
-				});
+        Assert::ExpectException<invalid_argument>([&js] {
+          js.getPlace(16U); // No such place
+        });
 
-				Assert::ExpectException<invalid_argument>([&js] {
-					set<unsigned> routes;
+        Assert::ExpectException<invalid_argument>([&js] {
+          // No such place
+          js.getPlace(GpsCoord<float>((float) 111.25_deg, (float) 2.5_deg));
+        });
+
+        vector<const IfPlace*> foundPlaces;
+        js.getAllPlacesNamed(u8"p16", foundPlaces); // No such place
+        Assert::IsTrue(foundPlaces.empty());
+
+        Assert::ExpectException<invalid_argument>([&js] {
+          js.getPlace(u8"p16"); // No such place
+        });
+
+        js.getAllPlacesNamed(u8"pp", foundPlaces);
+        // Places with ids: 1,3,6,7, sorted by their descriptions:
+        // "" for id3, "descr1" for id1, "descr6" for id6 and "descr7" for id7
+        Assert::IsTrue(foundPlaces.size() == 4ULL);
+        Assert::AreEqual(3U, foundPlaces[0ULL]->id());
+        Assert::AreEqual(1U, foundPlaces[1ULL]->id());
+        Assert::AreEqual(6U, foundPlaces[2ULL]->id());
+        Assert::AreEqual(7U, foundPlaces[3ULL]->id());
+
+        Assert::ExpectException<invalid_argument>([&js] {
+          js.getPlace(u8"pp", u8"descr16"); // No such place
+        });
+
+        Assert::ExpectException<invalid_argument>([&js] {
+					vector<unsigned> routes;
 					js.routesForPlace(16U, routes); // No such place
 				});
 
-				Assert::ExpectException<domain_error>([&js] {
-					set<unsigned> routes;
-					js.routesForPlace(0U, routes); // No route covers this place
-				});
-
-				set<unsigned> routes, expected { 1U, 2U, 3U };
+        vector<unsigned> routes, expected { 1U, 2U, 3U };
 				js.routesForPlace(1U, routes);
 				Assert::IsTrue(equal(CBOUNDS(routes), cbegin(expected)));
 
@@ -125,14 +159,14 @@ namespace UnitTests {
 				2017-Jul-14, 2017-Dec-25, 2017-Dec-31
 				*/
 				Assert::AreEqual(7ULL, udyaR1.size());
-				Assert::IsTrue(endIt != udyaR1.find(from_simple_string("2018-Jan-1")));
-				Assert::IsTrue(endIt != udyaR1.find(from_simple_string("2018-Jan-2")));
-				Assert::IsTrue(endIt != udyaR1.find(from_simple_string("2018-Jan-3")));
-				Assert::IsTrue(endIt != udyaR1.find(from_simple_string("2018-Apr-4")));
-				Assert::IsTrue(endIt == udyaR1.find(from_simple_string("2017-July-4")));
-				Assert::IsTrue(endIt != udyaR1.find(from_simple_string("2017-July-14")));
-				Assert::IsTrue(endIt != udyaR1.find(from_simple_string("2017-Dec-25")));
-				Assert::IsTrue(endIt != udyaR1.find(from_simple_string("2017-Dec-31")));
+				Assert::IsTrue(endIt != udyaR1.find(from_simple_string("2018-Jan-1"s)));
+				Assert::IsTrue(endIt != udyaR1.find(from_simple_string("2018-Jan-2"s)));
+				Assert::IsTrue(endIt != udyaR1.find(from_simple_string("2018-Jan-3"s)));
+				Assert::IsTrue(endIt != udyaR1.find(from_simple_string("2018-Apr-4"s)));
+				Assert::IsTrue(endIt == udyaR1.find(from_simple_string("2017-July-4"s)));
+				Assert::IsTrue(endIt != udyaR1.find(from_simple_string("2017-July-14"s)));
+				Assert::IsTrue(endIt != udyaR1.find(from_simple_string("2017-Dec-25"s)));
+				Assert::IsTrue(endIt != udyaR1.find(from_simple_string("2017-Dec-31"s)));
 
 				Assert::AreEqual(1.f, // ln(1+3.5*((e-1)/3.5)) == 1
 								 r1.pricingEngine().normalFare(expm1f(1.f)/3.5f),
@@ -217,7 +251,7 @@ namespace UnitTests {
 				// 2018-Jan-1, 2018-Jan-2, 2018-Jan-3, 2018-Mar-7, 2018-Apr-4
 				// 2017-Jul-14, 2017-Dec-25, 2017-Dec-31
 				Assert::AreEqual(8ULL, udyaRa5.size());
-				Assert::IsTrue(cend(udyaRa5) != udyaRa5.find(from_simple_string("2018-Mar-7")));
+				Assert::IsTrue(cend(udyaRa5) != udyaRa5.find(from_simple_string("2018-Mar-7"s)));
 				
 				Assert::AreEqual(50U, ra5.economySeatsCapacity());
 				Assert::AreEqual(0U, ra5.businessSeatsCapacity());
@@ -244,8 +278,8 @@ namespace UnitTests {
 
 			Assert::ExpectException<exception>([] {
 				// Strings containing TABs
-				istringstream iss(R"({"root":"strings	with	tabs	are	not ok!"})");
-				::JsonSource js(move(iss));
+				const string str(R"({"root":"strings	with	tabs	are	not ok!"})");
+        tp::specs::JsonSource js(str);
 			});
 		}
 
@@ -254,73 +288,91 @@ namespace UnitTests {
 
 			Assert::ExpectException<domain_error>([] {
 				// Duplicate place id-s
-				istringstream iss(R"({"Scenario": { "Places" : [
-	{"id":1, "name":"p1"},
-	{"id":2, "name":"p2"},
-	{"id":1, "name":"p3"}
+				const string str(R"({"Scenario": { "Places" : [
+	{"id":1, "names":"p1", "lat":0, "long":0},
+	{"id":2, "names":"p2", "lat":1, "long":0},
+	{"id":1, "names":"p3", "lat":2, "long":0}
 ]}})");
-				::JsonSource js(move(iss));
+        tp::specs::JsonSource js(str);
 			});
 
 			Assert::ExpectException<domain_error>([] {
-				// Duplicate place names
-				istringstream iss(R"({"Scenario": { "Places" : [
-	{"id":1, "name":"p1"},
-	{"id":2, "name":"p2"},
-	{"id":3, "name":"p2"}
+				// Duplicate place names when no place descriptions available
+        const string str(R"({"Scenario": { "Places" : [
+	{"id":1, "names":"p1", "lat":0, "long":0},
+	{"id":2, "names":"p2", "lat":1, "long":0},
+	{"id":3, "names":"p2", "lat":2, "long":0}
 ]}})");
-				::JsonSource js(move(iss));
-			});
-		}
-
-		TEST_METHOD(JsonSource_LessThan2Places_Throws) {
-			Logger::WriteMessage(__FUNCTION__);
-
-			// No section for places at all
-			Assert::ExpectException<exception>([] {
-				istringstream iss(R"({"Scenario": {}})");
-				::JsonSource js(move(iss));
+        tp::specs::JsonSource js(str);
 			});
 
-			// No place defined
-			Assert::ExpectException<domain_error>([] {
-				istringstream iss(R"({"Scenario": { "Places" : [
+      Assert::ExpectException<domain_error>([] {
+        // Duplicate (place alias, place description) pair
+        const string str(R"({"Scenario": { "Places" : [
+	{"id":1, "names":"pp|p1", "descr" : "dd", "lat":0, "long":0},
+	{"id":2, "names":"p2|pp", "descr" : "dd", "lat":1, "long":0}
 ]}})");
-				::JsonSource js(move(iss));
-			});
+        tp::specs::JsonSource js(str);
+      });
 
-			// Single place defined
-			Assert::ExpectException<domain_error>([] {
-				istringstream iss(R"({"Scenario": { "Places" : [
-	{"id":1, "name":"p1"}
+      Assert::ExpectException<domain_error>([] {
+        // Duplicate GPS
+        const string str(R"({"Scenario": { "Places" : [
+	{"id":1, "names":"p1", "lat":0, "long":0},
+	{"id":2, "names":"p2", "lat":0, "long":0}
 ]}})");
-				::JsonSource js(move(iss));
-			});
+        tp::specs::JsonSource js(str);
+      });
+    }
 
-			// For >= 2 places shouldn't throw
-			// domain_error("There must be at least 2 places!")
-			try {
-				istringstream iss(R"({"Scenario": { "Places" : [
-	{"id":1, "name":"p1"},
-	{"id":2, "name":"p2"}
+    TEST_METHOD(JsonSource_LessThan2Places_Throws) {
+      Logger::WriteMessage(__FUNCTION__);
+
+      // No section for places at all
+      Assert::ExpectException<exception>([] {
+        const string str(R"({"Scenario": {}})");
+        tp::specs::JsonSource js(str);
+      });
+
+      // No place defined
+      Assert::ExpectException<domain_error>([] {
+        const string str(R"({"Scenario": { "Places" : [
 ]}})");
-				::JsonSource js(move(iss));
+        tp::specs::JsonSource js(str);
+      });
 
-			} catch(exception &e) {
-				// The stream is providing only the part concerning the places and
-				// it should throw some exception about missing the rest of the information
-				Assert::AreNotEqual("There must be at least 2 places!", e.what());
-			}
-		}
+      // Single place defined
+      Assert::ExpectException<domain_error>([] {
+        const string str(R"({"Scenario": { "Places" : [
+	{"id":1, "names":"p1", "lat":0, "long":0}
+]}})");
+        tp::specs::JsonSource js(str);
+      });
 
-		TEST_METHOD(JsonSource_FoundDuplicaterouteSharedInfoId_Throws) {
+      // For >= 2 places shouldn't throw
+      // domain_error("There must be at least 2 places!")
+      try {
+        const string str(R"({"Scenario": { "Places" : [
+	{"id":1, "names":"p1", "lat":0, "long":0},
+	{"id":2, "names":"p2", "lat":1, "long":0}
+]}})");
+        tp::specs::JsonSource js(str);
+
+      } catch(exception &e) {
+        // The stream is providing only the part concerning the places and
+        // it should throw some exception about missing the rest of the information
+        Assert::AreNotEqual("There must be at least 2 places!", e.what());
+      }
+    }
+
+    TEST_METHOD(JsonSource_FoundDuplicateRouteSharedInfoId_Throws) {
 			Logger::WriteMessage(__FUNCTION__);
 
 			// There are routes with the same id
 			Assert::ExpectException<domain_error>([] {
-				istringstream iss(R"({"Scenario": { "Places" : [
-	{"id":1, "name":"p1"},
-	{"id":2, "name":"p2"}],
+        const string str(R"({"Scenario": { "Places" : [
+	{"id":1, "names":"p1", "lat":0, "long":0},
+	{"id":2, "names":"p2", "lat":1, "long":0}],
 "Routes": [
 	{"RouteId":1, "TM" : "Road", "EF" : 3.5,
 		"Route" :
@@ -334,68 +386,168 @@ namespace UnitTests {
 			{"NextPlaceId":13, "dist" : 30.3}]},
 		"Alternatives" : []}
 ]}})");
-				::JsonSource js(move(iss));
+        tp::specs::JsonSource js(str);
 			});
 		}
 
-		TEST_METHOD(JsonSource_WrongCustomizedOdw_Throws) {
+    TEST_METHOD(JsonSource_NoRouteLinks_Throws) {
+      Logger::WriteMessage(__FUNCTION__);
+
+      // The section Links is empty
+      Assert::ExpectException<domain_error>([] {
+        const string str(R"({"Scenario": { "Places" : [
+	{"id":1, "names":"p1", "lat":0, "long":0},
+	{"id":2, "names":"p2", "lat":1, "long":0}],
+"Routes": [
+	{"RouteId":1, "TM" : "Road", "EF" : 3.5,
+		"Route" : {"StartPlaceId":1, "Links" : []},
+		"Alternatives" : []}
+]}})");
+        tp::specs::JsonSource js(str);
+      });
+    }
+
+    TEST_METHOD(JsonSource_NoRouteAlternatives_Throws) {
+      Logger::WriteMessage(__FUNCTION__);
+
+      // The section Alternatives is empty
+      Assert::ExpectException<domain_error>([] {
+        const string str(R"({"Scenario": { "Places" : [
+	{"id":1, "names":"p1", "lat":0, "long":0},
+	{"id":2, "names":"p2", "lat":1, "long":0}],
+"Routes": [
+	{"RouteId":1, "TM" : "Road", "EF" : 3.5,
+		"Route" : {"StartPlaceId":1, "Links" : [
+      {"NextPlaceId":2, "dist" : 208.6}]},
+		"Alternatives" : []}
+]}})");
+        tp::specs::JsonSource js(str);
+      });
+    }
+
+    TEST_METHOD(JsonSource_UncoveredPlaces_Throws) {
+      Logger::WriteMessage(__FUNCTION__);
+
+      // Not routes at all
+      Assert::ExpectException<domain_error>([] {
+        const string str(R"({"Scenario": { "Places" : [
+	{"id":1, "names":"p1", "lat":0, "long":0},
+	{"id":2, "names":"p2", "lat":1, "long":0}],
+"Routes": []}})");
+        tp::specs::JsonSource js(str);
+      });
+
+      // Not enough routes (Places p0 and p3 are not covered)
+      Assert::ExpectException<domain_error>([] {
+        const string str(R"({"Scenario": { "Places" : [
+  {"id":0, "names":"p0", "lat":0, "long":0},
+	{"id":1, "names":"p1", "lat":1, "long":0},
+	{"id":2, "names":"p2", "lat":2, "long":0},
+	{"id":3, "names":"p3", "lat":3, "long":0}],
+"Routes": [
+	{"RouteId":1, "TM" : "Road", "EF" : 3.5,
+		"Route" : {"StartPlaceId":1, "Links" : [
+      {"NextPlaceId":2, "dist" : 208.6}]},
+		"Alternatives" : [{"ESA" : 20, "TT" : "7:30-9:0"}]}
+]}})");
+        tp::specs::JsonSource js(str);
+      });
+    }
+
+    TEST_METHOD(JsonSource_UnknownRoutePlaces_Throws) {
+      Logger::WriteMessage(__FUNCTION__);
+
+      // Unknown StartPlaceId
+      // Fails to catch domain_error, as it was thrown
+      // Same test performed outside the unit tests works with domain_error.
+      Assert::ExpectException<exception>([] {
+        const string str(R"({"Scenario": { "Places" : [
+	{"id":1, "names":"p1", "lat":0, "long":0},
+	{"id":2, "names":"p2", "lat":1, "long":0}],
+"Routes": [
+	{"RouteId":1, "TM" : "Road", "EF" : 3.5,
+		"Route" : {"StartPlaceId":3, "Links" : [
+      {"NextPlaceId":2, "dist" : 208.6}]},
+		"Alternatives" : [{"ESA" : 20, "TT" : "7:30-9:0"}]}
+]}})");
+        tp::specs::JsonSource js(str);
+      });
+
+      // Unknown NextPlaceId
+      // Fails to catch domain_error, as it was thrown
+      // Same test performed outside the unit tests works with domain_error.
+      Assert::ExpectException<exception>([] {
+        const string str(R"({"Scenario": { "Places" : [
+	{"id":1, "names":"p1", "lat":0, "long":0},
+	{"id":2, "names":"p2", "lat":1, "long":0},
+"Routes": [
+	{"RouteId":1, "TM" : "Road", "EF" : 3.5,
+		"Route" : {"StartPlaceId":1, "Links" : [
+      {"NextPlaceId":3, "dist" : 208.6}]},
+		"Alternatives" : [{"ESA" : 20, "TT" : "7:30-9:0"}]}
+]}})");
+        tp::specs::JsonSource js(str);
+      });
+    }
+
+    TEST_METHOD(JsonSource_WrongCustomizedOdw_Throws) {
 			Logger::WriteMessage(__FUNCTION__);
 
 			// The alternative of the route has more operational days within a week:
 			// 1111111 (customized) versus 0111110 (previously)
 			Assert::ExpectException<domain_error>([] {
-				istringstream iss(R"({"Scenario": { "Places" : [
-	{"id":1, "name":"p1"},
-	{"id":2, "name":"p2"}],
+				const string str(R"({"Scenario": { "Places" : [
+	{"id":1, "names":"p1", "lat":0, "long":0},
+	{"id":2, "names":"p2", "lat":1, "long":0}],
 "Routes": [
 	{"RouteId":1, "TM" : "Road", "EF" : 3.5,
 	"ODW": "0111110",
 		"Route" :
 			{"StartPlaceId":1, "Links": [
-			{"NextPlaceId":6, "dist" : 208.6}]},
+			{"NextPlaceId":2, "dist" : 208.6}]},
 		"Alternatives" : [
 			{"ESA" : 20, "TT" : "7:30-9:0",
 			"ODW" : "1111111"}
 ]}]}})");
-				::JsonSource js(move(iss));
+        tp::specs::JsonSource js(str);
 			});
 
 			// The alternative of the route has a new operational day within a week:
 			// 1111100 (customized) versus 0111110 (previously)
 			Assert::ExpectException<domain_error>([] {
-				istringstream iss(R"({"Scenario": { "Places" : [
-	{"id":1, "name":"p1"},
-	{"id":2, "name":"p2"}],
+				const string str(R"({"Scenario": { "Places" : [
+	{"id":1, "names":"p1", "lat":0, "long":0},
+	{"id":2, "names":"p2", "lat":1, "long":0}],
 "Routes": [
 	{"RouteId":1, "TM" : "Road", "EF" : 3.5,
 	"ODW": "0111110",
 		"Route" :
 			{"StartPlaceId":1, "Links": [
-			{"NextPlaceId":6, "dist" : 208.6}]},
+			{"NextPlaceId":2, "dist" : 208.6}]},
 		"Alternatives" : [
 			{"ESA" : 20, "TT" : "7:30-9:0",
 			"ODW" : "1111100"}
 ]}]}})");
-				::JsonSource js(move(iss));
+        tp::specs::JsonSource js(str);
 			});
 
 			// Correct update of ODW for a route alternative
 			// customized: 0111100 (Mon-Thu); previously: 0111110 (Mon-Fri)
 			try {
-				istringstream iss(R"({"Scenario": { "Places" : [
-	{"id":1, "name":"p1"},
-	{"id":2, "name":"p2"}],
+				const string str(R"({"Scenario": { "Places" : [
+	{"id":1, "names":"p1", "lat":0, "long":0},
+	{"id":2, "names":"p2", "lat":1, "long":0}],
 "Routes": [
 	{"RouteId":1, "TM" : "Road", "EF" : 3.5,
 	"ODW": "0111110",
 		"Route" :
 			{"StartPlaceId":1, "Links": [
-			{"NextPlaceId":6, "dist" : 208.6}]},
+			{"NextPlaceId":2, "dist" : 208.6}]},
 		"Alternatives" : [
 			{"ESA" : 20, "TT" : "7:30-9:0",
 			"ODW" : "0111100"}
 ]}]}})");
-				::JsonSource js(move(iss));
+        tp::specs::JsonSource js(str);
 				const IRouteAlternative &ra0 = js.routeAlternative(0U);
 				Assert::IsTrue(ra0.routeSharedInfo().customizableInfo().
 							   operationalDaysOfWeek()->test(Friday));
@@ -410,65 +562,73 @@ namespace UnitTests {
 		TEST_METHOD(JsonSource_WrongCustomizedUdya_Throws) {
 			Logger::WriteMessage(__FUNCTION__);
 
-			// The alternative of the route has less unoperational days:
+      const ptime refMoment(from_simple_string("2017-Sep-16"));
+
+      // Make sure the next 2 configurations of UDYA consider that 'today' is 2017-Sep-16
+      nowReplacements.resize(2ULL, refMoment);
+      
+      // The alternative of the route has less unoperational days:
 			// Empty set (customized) versus Jan-3|Apr-4|July-4 (previously)
 			Assert::ExpectException<domain_error>([] {
-				istringstream iss(R"({"Scenario": { "Places" : [
-	{"id":1, "name":"p1"},
-	{"id":2, "name":"p2"}],
+				const string str(R"({"Scenario": { "Places" : [
+	{"id":1, "names":"p1", "lat":0, "long":0},
+	{"id":2, "names":"p2", "lat":1, "long":0}],
 "Routes": [
 	{"RouteId":1, "TM" : "Road", "EF" : 3.5,
 	"UDYA": "Jan-3|Apr-4|July-4",
 		"Route" :
 			{"StartPlaceId":1, "Links": [
-			{"NextPlaceId":6, "dist" : 208.6}]},
+			{"NextPlaceId":2, "dist" : 208.6}]},
 		"Alternatives" : [
 			{"ESA" : 20, "TT" : "7:30-9:0",
 			"UDYA" : ""}
 ]}]}})");
-				::JsonSource js(move(iss));
+        tp::specs::JsonSource js(str);
 			});
 
-			// The alternative of the route forgets about a previous unoperational day (Jan-3):
+      // Make sure the next 2 configurations of UDYA consider that 'today' is 2017-Sep-16
+      nowReplacements.resize(2ULL, refMoment);
+      
+      // The alternative of the route forgets about a previous unoperational day (Jan-3):
 			// Apr-4|July-4|Aug-8 (customized) versus Jan-3|Apr-4|July-4 (previously)
 			Assert::ExpectException<domain_error>([] {
-				istringstream iss(R"({"Scenario": { "Places" : [
-	{"id":1, "name":"p1"},
-	{"id":2, "name":"p2"}],
+				const string str(R"({"Scenario": { "Places" : [
+	{"id":1, "names":"p1", "lat":0, "long":0},
+	{"id":2, "names":"p2", "lat":1, "long":0}],
 "Routes": [
 	{"RouteId":1, "TM" : "Road", "EF" : 3.5,
 	"UDYA": "Jan-3|Apr-4|July-4",
 		"Route" :
 			{"StartPlaceId":1, "Links": [
-			{"NextPlaceId":6, "dist" : 208.6}]},
+			{"NextPlaceId":2, "dist" : 208.6}]},
 		"Alternatives" : [
 			{"ESA" : 20, "TT" : "7:30-9:0",
 			"UDYA" : "Apr-4|July-4|Aug-8"}
 ]}]}})");
-				::JsonSource js(move(iss));
+        tp::specs::JsonSource js(str);
 			});
 
 
 			// Make sure the next 2 configurations of UDYA consider that 'today' is 2017-Sep-16
-			nowReplacements.resize(2ULL, ptime(from_simple_string("2017-Sep-16")));
+			nowReplacements.resize(2ULL, refMoment);
 
 			// Correct update of UDYA for a route alternative (added Aug-8)
 			// customized: Jan-3|Apr-4|July-4|Aug-8; previously: Jan-3|Apr-4|July-4
 			try {
-				istringstream iss(R"({"Scenario": { "Places" : [
-	{"id":1, "name":"p1"},
-	{"id":2, "name":"p2"}],
+				const string str(R"({"Scenario": { "Places" : [
+	{"id":1, "names":"p1", "lat":0, "long":0},
+	{"id":2, "names":"p2", "lat":1, "long":0}],
 "Routes": [
 	{"RouteId":1, "TM" : "Road", "EF" : 3.5,
 	"UDYA": "Jan-3|Apr-4|July-4",
 		"Route" :
 			{"StartPlaceId":1, "Links": [
-			{"NextPlaceId":6, "dist" : 208.6}]},
+			{"NextPlaceId":2, "dist" : 208.6}]},
 		"Alternatives" : [
 			{"ESA" : 20, "TT" : "7:30-9:0",
 			"UDYA" : "Jan-3|Apr-4|July-4|Aug-8"}
 ]}]}})");
-				::JsonSource js(move(iss));
+        tp::specs::JsonSource js(str);
 				const IRouteAlternative &ra0 = js.routeAlternative(0U);
 				const set<date> &previously = *ra0.routeSharedInfo().customizableInfo().
 					unavailDaysForTheYearAhead(),

@@ -3,7 +3,9 @@
 *.opendb
 *.sdf
 *.user
+*.VC.db
 
+.d
 .vs
 ipch
 TestResults

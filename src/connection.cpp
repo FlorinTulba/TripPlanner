@@ -25,59 +25,69 @@
 #include "connection.h"
 #include "transpModes.h"
 
+#pragma warning ( push, 0 )
+
 #include <cassert>
 #include <stdexcept>
 #include <cmath>
 
+#pragma warning ( pop )
+
 using namespace std;
 using namespace boost::posix_time;
 
-Connection::Connection(size_t from_, size_t to_,
-					   const time_period &interval_,
-					   int transpModes_, float price_, float dist) :
-			_from(from_), _to(to_),
-			_interval(interval_.begin(), interval_.end() + time_duration::unit()),
-			_transpModes(size_t(transpModes_)),
-			_price(price_), _distance(dist) {
-	if(_from == _to || _interval.is_null() ||
-	   price_ <= 0.f || dist <= 0.f ||
-	   (transpModes_ != TranspModes::AIR && transpModes_ != TranspModes::RAIL &&
-		transpModes_ != TranspModes::ROAD && transpModes_ != TranspModes::WATER))
-		throw invalid_argument(__FUNCTION__
-							   " expects strictly positive price_ and dist,"
-							   " transpModes_ among the enum from TranspModes,"
-							   " a non-empty interval_"
-							   " and distinct from_ and to_!");
-}
+// namespace trip planner - queries
+namespace tp { namespace queries {
 
-ptime Connection::begin() const {
-	return _interval.begin();
-}
+  Connection::Connection(size_t from_, size_t to_,
+                         const time_period &interval_,
+                         int transpModes_, float price_, float dist) :
+      _from(from_), _to(to_),
+      _interval(interval_.begin(), interval_.end() + time_duration::unit()),
+      _transpModes(size_t(transpModes_)),
+      _price(price_), _distance(dist) {
+    using namespace specs;
+    if(_from == _to || _interval.is_null() ||
+       price_ <= 0.f || dist <= 0.f ||
+       (transpModes_ != TranspModes::AIR && transpModes_ != TranspModes::RAIL &&
+        transpModes_ != TranspModes::ROAD && transpModes_ != TranspModes::WATER))
+		  throw invalid_argument(string(__func__) +
+                             " expects strictly positive price_ and dist,"
+                             " transpModes_ among the enum from TranspModes,"
+                             " a non-empty interval_"
+                             " and distinct from_ and to_!");
+  }
 
-ptime Connection::end() const {
-	return _interval.last();
-}
+  ptime Connection::begin() const {
+	  return _interval.begin();
+  }
 
-size_t Connection::from() const {
-	return _from;
-}
+  ptime Connection::end() const {
+	  return _interval.last();
+  }
 
-size_t Connection::to() const {
-	return _to;
-}
+  size_t Connection::from() const {
+	  return _from;
+  }
 
-time_duration Connection::duration() const {
-	return _interval.length();
-}
+  size_t Connection::to() const {
+	  return _to;
+  }
 
-float Connection::price() const {
-	return _price;
-}
+  time_duration Connection::duration() const {
+	  return _interval.length();
+  }
 
-float Connection::distance() const {
-	return _distance;
-}
+  float Connection::price() const {
+	  return _price;
+  }
 
-size_t Connection::transpModes() const {
-	return _transpModes;
-}
+  float Connection::distance() const {
+	  return _distance;
+  }
+
+  size_t Connection::transpModes() const {
+	  return _transpModes;
+  }
+
+}} // namespace tp::queries

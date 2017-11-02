@@ -26,31 +26,58 @@
 
 using namespace std;
 
-DbSource::DbSource(const string &dbUrl, const string &dbName,
-				   const IfCredentials &credentialsProvider) {}
+// namespace trip planner - specifications
+namespace tp { namespace specs {
 
-IfPlace& DbSource::getPlace(unsigned id) const {
-	throw exception("");
-}
+  DbSource::DbSource(const string &dbUrl, const string &dbName,
+                     const IfCredentials &credentialsProvider) {}
 
-IfPlace& DbSource::getPlace(const IfUniquePlace &uniquePlaceTraits) const {
-	throw exception("");
-}
+  void DbSource::reload() {
+    throw exception();
+  }
 
-void DbSource::routesForPlace(unsigned placeId,
-							  set<unsigned> &routeSharedInfoIds) const {
-	throw exception("");
-}
+  void DbSource::idsOfAllPlaces(vector<unsigned> &placeIds) const {
+	  throw exception();
+  }
 
-void DbSource::routesForPlaces(const set<unsigned> &placeIds,
-							   set<unsigned> &routeSharedInfoIds) const {
-	throw exception("");
-}
+  const IfPlace& DbSource::getPlace(unsigned id) const {
+	  throw exception();
+  }
 
-IRouteSharedInfo& DbSource::routeSharedInfo(unsigned routeSharedInfoId) const {
-	throw exception("");
-}
+  const IfPlace & DbSource::getPlace(const GpsCoord<float>& gps) const {
+    throw exception();
+  }
 
-IRouteAlternative& DbSource::routeAlternative(unsigned raId) const {
-	throw exception("");
-}
+  const IfPlace & DbSource::getPlace(const string &knownAs,
+                                     const string &shortDescr/* = u8""*/) const {
+    throw exception();
+  }
+
+  void DbSource::getAllPlacesNamed(const string &name,
+                                   vector<const IfPlace*> &places) const {
+    throw exception();
+  }
+
+  void DbSource::idsOfAllRoutes(vector<unsigned>& routeSharedInfoIds) const {
+    throw exception();
+  }
+
+  void DbSource::routesForPlace(unsigned placeId,
+                                vector<unsigned> &routeSharedInfoIds) const {
+	  throw exception();
+  }
+
+  void DbSource::routesForPlaces(const set<unsigned> &placeIds,
+                                 vector<unsigned> &routeSharedInfoIds) const {
+	  throw exception();
+  }
+
+  IRouteSharedInfo& DbSource::routeSharedInfo(unsigned routeSharedInfoId) const {
+	  throw exception();
+  }
+
+  IRouteAlternative& DbSource::routeAlternative(unsigned raId) const {
+	  throw exception();
+  }
+
+}} // namespace tp::specs

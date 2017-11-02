@@ -26,134 +26,140 @@
 #include "customDateTimeProcessor.h"
 #include "util.h"
 
+#pragma warning ( push, 0 )
+
 #include <boost/date_time/gregorian/parsers.hpp>
 #include <boost/date_time/posix_time/time_parsers.hpp>
+
+#pragma warning ( pop )
 
 using namespace std;
 using namespace boost::posix_time;
 using namespace boost::gregorian;
 
-RouteAlternative::RouteAlternative(unsigned id_, IRouteSharedInfo &rsi,
-								   unsigned esa_, unsigned bsa_,
-								   const string &timetable_,
-								   bool returnTrip_) :
-		_rsi(rsi),
-		odw(rsi.customizableInfo().operationalDaysOfWeek()),
-		udya(rsi.customizableInfo().unavailDaysForTheYearAhead()),
-		_id(id_), _returnTrip(returnTrip_), esa(esa_), bsa(bsa_) {
-	updateTimetable(timetable_);
-}
+// namespace trip planner - specifications
+namespace tp { namespace specs {
 
-unsigned RouteAlternative::id() const {
-	return _id;
-}
+  RouteAlternative::RouteAlternative(unsigned id_, IRouteSharedInfo &rsi,
+                                     unsigned esa_, unsigned bsa_,
+                                     const string &timetable_,
+                                     bool returnTrip_) :
+		  _rsi(rsi),
+		  odw(rsi.customizableInfo().operationalDaysOfWeek()),
+		  udya(rsi.customizableInfo().unavailDaysForTheYearAhead()),
+		  _id(id_), _returnTrip(returnTrip_), esa(esa_), bsa(bsa_) {
+	  updateTimetable(timetable_);
+  }
 
-const IRouteSharedInfo& RouteAlternative::routeSharedInfo() const {
-	return _rsi;
-}
+  unsigned RouteAlternative::id() const {
+	  return _id;
+  }
 
-bool RouteAlternative::returnTrip() const {
-	return _returnTrip;
-}
+  const IRouteSharedInfo& RouteAlternative::routeSharedInfo() const {
+	  return _rsi;
+  }
 
-shared_ptr<bitset<7>> RouteAlternative::operationalDaysOfWeek() const {
-	assert(nullptr != odw);
-	return odw;
-}
+  bool RouteAlternative::returnTrip() const {
+	  return _returnTrip;
+  }
 
-shared_ptr<set<date>> RouteAlternative::unavailDaysForTheYearAhead() const {
-	assert(nullptr != udya);
-	return udya;
-}
+  shared_ptr<bitset<7>> RouteAlternative::operationalDaysOfWeek() const {
+	  assert(nullptr != odw);
+	  return odw;
+  }
 
-unsigned RouteAlternative::economySeatsCapacity() const {
-	return esa;
-}
+  shared_ptr<set<date>> RouteAlternative::unavailDaysForTheYearAhead() const {
+	  assert(nullptr != udya);
+	  return udya;
+  }
 
-unsigned RouteAlternative::businessSeatsCapacity() const {
-	return bsa;
-}
+  unsigned RouteAlternative::economySeatsCapacity() const {
+	  return esa;
+  }
 
-const vector<time_period>& RouteAlternative::timetable() const {
-	return _timetable;
-}
+  unsigned RouteAlternative::businessSeatsCapacity() const {
+	  return bsa;
+  }
 
-void RouteAlternative::updateUnavailDaysForTheYearAhead(const string &udya_) {
-	shared_ptr<set<date>> newUdya = make_shared<set<date>>();
-	::updateUnavailDaysForTheYearAhead(udya_, *newUdya);
+  const vector<time_period>& RouteAlternative::timetable() const {
+	  return _timetable;
+  }
+
+  void RouteAlternative::updateUnavailDaysForTheYearAhead(const string &udya_) {
+	  shared_ptr<set<date>> newUdya = make_shared<set<date>>();
+	  tp::updateUnavailDaysForTheYearAhead(udya_, *newUdya);
 	
-	// Ensure the new set is a larger version of the previous udya
-	if(newUdya->size() > udya->size()) {
-		set<date> forgotten;
-		set_difference(CBOUNDS(*udya), CBOUNDS(*newUdya),
-					   inserter(forgotten, forgotten.begin()));
-		if(forgotten.empty()) {
-			udya = newUdya;
-			return;
-		}
-	}
+	  // Ensure the new set is a larger version of the previous udya
+	  if(newUdya->size() > udya->size()) {
+		  set<date> forgotten;
+		  set_difference(CBOUNDS(*udya), CBOUNDS(*newUdya),
+                     inserter(forgotten, forgotten.begin()));
+		  if(forgotten.empty()) {
+			  udya = newUdya;
+			  return;
+		  }
+	  }
 
-	ostringstream oss;
-	oss<<__FUNCTION__ " requires that the set of dates "
-		"provided by the udya_ parameter covers all "
-		"previously known unoperational days and adds new ones!";
-	throw domain_error(oss.str());
-}
+	  throw domain_error(string(__func__) + " requires that the set of dates "
+                       "provided by the udya_ parameter covers all "
+                       "previously known unoperational days and adds new ones!");
+  }
 
-void RouteAlternative::updateOperationalDaysOfWeek(const string &odw_) {
-	shared_ptr<bitset<7>> newOdw = make_shared<bitset<7>>(string(CRBOUNDS(odw_)));
+  void RouteAlternative::updateOperationalDaysOfWeek(const string &odw_) {
+	  shared_ptr<bitset<7>> newOdw = make_shared<bitset<7>>(string(CRBOUNDS(odw_)));
 
-	// Ensure the new set of operational days within a week is
-	// a smaller version of the previous odw
-	if(newOdw->count() < odw->count()) {
-		const bitset<7> extraOperationalDays = *newOdw & ~*odw;
-		if(extraOperationalDays.none()) {
-			odw = newOdw;
-			return;
-		}
-	}
+	  // Ensure the new set of operational days within a week is
+	  // a smaller version of the previous odw
+	  if(newOdw->count() < odw->count()) {
+		  const bitset<7> extraOperationalDays = *newOdw & ~*odw;
+		  if(extraOperationalDays.none()) {
+			  odw = newOdw;
+			  return;
+		  }
+	  }
 
-	ostringstream oss;
-	oss<<__FUNCTION__ " requires that the set of days of the week "
-		"provided by the odw_ parameter covers less "
-		"from the previous set!";
-	throw domain_error(oss.str());
-}
+	  throw domain_error(string(__func__) +
+                       " requires that the set of days of the week "
+                       "provided by the odw_ parameter covers less "
+                       "from the previous set!");
+  }
 
-void RouteAlternative::updateTimetable(const string &timetable_) {
-	_timetable.clear();
+  void RouteAlternative::updateTimetable(const string &timetable_) {
+	  _timetable.clear();
 
-	// Constructing ptime requires also a Gregorian date value
-	// The actual date value is not important, as only the hours and minutes matter.
-	static const date aDate(from_simple_string("2017-Jan-1"));
+	  // Constructing ptime requires also a Gregorian date value
+	  // The actual date value is not important, as only the hours and minutes matter.
+	  static const date aDate(from_simple_string("2017-Jan-1"s));
 
-	ostringstream oss; // to report eventual errors
+	  ostringstream oss; // to report eventual errors
 
-	// The intervals are separated by '|' among 0 or more space-like symbols
-	const vector<string> intervals = tokenize(timetable_, R"(\s*\|\s*)");
-	if(intervals.size() + 1ULL != _rsi.stopsCount()) {
-		oss<<"Current route involves "<<_rsi.stopsCount()<<" stops. "
-			"However, the timetable `"<<timetable_<<"` presents a different situation.";
-		throw domain_error(oss.str());
-	}
+	  // The intervals are separated by '|' among 0 or more space-like symbols
+	  const vector<string> intervals = tokenize(timetable_, R"(\s*\|\s*)");
+	  if(intervals.size() + 1ULL != _rsi.stopsCount()) {
+		  oss<<"Current route involves "<<_rsi.stopsCount()<<" stops. "
+			  "However, the timetable `"<<timetable_<<"` presents a different situation.";
+		  throw domain_error(oss.str());
+	  }
 
-	for(const string &interval : intervals) {
-		// Each interval contains 2 time moments separated by '-' among 0 or more space-like symbols
-		const vector<string> moments = tokenize(interval, R"(\s*-\s*)");
-		if(moments.size() != 2ULL) {
-			oss<<"All time intervals from a timetable need 2 moments. "
-				"This doesn't happen in `"<<timetable_<<'`';
-			throw domain_error(oss.str());
-		}
+	  for(const string &interval : intervals) {
+		  // Each interval contains 2 time moments separated by '-' among 0 or more space-like symbols
+		  const vector<string> moments = tokenize(interval, R"(\s*-\s*)");
+		  if(moments.size() != 2ULL) {
+			  oss<<"All time intervals from a timetable need 2 moments. "
+				  "This doesn't happen in `"<<timetable_<<'`';
+			  throw domain_error(oss.str());
+		  }
 
-		const ptime t1(aDate, duration_from_string(moments.front()));
-		const ptime t2(aDate, duration_from_string(moments.back()));
+		  const ptime t1(aDate, duration_from_string(moments.front()));
+		  const ptime t2(aDate, duration_from_string(moments.back()));
 
-		if(t1 >= t2 || (!_timetable.empty() &&
-						_timetable.back().last() >= t1)) {
-			oss<<"The times need to be distinct and ordered in: `"<<timetable_<<'`';
-			throw domain_error(oss.str());
-		}
-		_timetable.emplace_back(t1, t2 + time_duration::unit());
-	}
-}
+		  if(t1 >= t2 || (!_timetable.empty() &&
+                      _timetable.back().last() >= t1)) {
+			  oss<<"The times need to be distinct and ordered in: `"<<timetable_<<'`';
+			  throw domain_error(oss.str());
+		  }
+		  _timetable.emplace_back(t1, t2 + time_duration::unit());
+	  }
+  }
+
+}} // namespace tp::specs

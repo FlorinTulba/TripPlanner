@@ -25,51 +25,59 @@
 #include "results.h"
 #include "variants.h"
 
+#pragma warning ( push, 0 )
+
 #include <cassert>
+
+#pragma warning ( pop )
 
 using namespace std;
 
-const vector<const char*>& variantCategories() {
-	static const vector<const char*> categs {
-		"most rapid variants",
-		"cheapest variants",
-		"shortest routes",
-		"variants getting to the destination the soonest",
-		"variants with shortest stationary time"
-	};
-	return categs;
-}
+namespace tp { namespace queries {
 
-Results::Results() {
-	const size_t categories = variantCategories().size();
-	results.reserve(categories);
-	for(size_t i = 0ULL; i < categories; ++i)
-		results.emplace_back(new Variants);
-}
+  const vector<const char*>& variantCategories() {
+	  static const vector<const char*> categs {
+		  "most rapid variants",
+		  "cheapest variants",
+		  "shortest routes",
+		  "variants getting to the destination the soonest",
+		  "variants with shortest stationary time"
+	  };
+	  return categs;
+  }
 
-IVariants& Results::get(size_t categ) const {
-	if(categ >= variantCategories().size())
-		throw out_of_range(__FUNCTION__ " invalid categ!");
+  Results::Results() {
+	  const size_t categories = variantCategories().size();
+	  results.reserve(categories);
+	  for(size_t i = 0ULL; i < categories; ++i)
+		  results.emplace_back(new Variants);
+  }
 
-	assert(results[categ]);
-	return *results[categ];
-}
+  IVariants& Results::get(size_t categ) const {
+	  if(categ >= variantCategories().size())
+		  throw out_of_range(string(__func__) + " invalid categ!");
 
-const IVariants& Results::operator[](size_t categ) const {
-	return get(categ);
-}
+	  assert(results[categ]);
+	  return *results[categ];
+  }
 
-IVariants& Results::operator[](size_t categ) {
-	return get(categ);
-}
+  const IVariants& Results::operator[](size_t categ) const {
+	  return get(categ);
+  }
 
-ostream& operator<<(ostream &os, const IResults &results) {
-	const size_t categories = variantCategories().size();
-	for(size_t i = 0ULL; i < categories; ++i) {
-		os<<"Viewing the "<<variantCategories()[i]<<':'<<endl<<endl;
-		os<<results[i];
-		os<<endl<<string(80ULL, '=')<<endl<<endl<<endl;
-	}
+  IVariants& Results::operator[](size_t categ) {
+	  return get(categ);
+  }
 
-	return os;
+}} // namespace tp::queries
+
+ostream& operator<<(ostream &os, const tp::queries::IResults &results) {
+  const size_t categories = tp::queries::variantCategories().size();
+  for(size_t i = 0ULL; i < categories; ++i) {
+    os<<"Viewing the "<<tp::queries::variantCategories()[i]<<':'<<endl<<endl;
+    os<<results[i];
+    os<<endl<<string(80ULL, '=')<<endl<<endl<<endl;
+  }
+
+  return os;
 }

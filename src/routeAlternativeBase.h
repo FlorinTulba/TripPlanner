@@ -22,30 +22,38 @@
  If not, see <http://www.gnu.org/licenses/agpl-3.0.txt>.
  *****************************************************************************/
 
-#pragma once
+#ifndef H_ROUTE_ALTERNATIVE_BASE
+#define H_ROUTE_ALTERNATIVE_BASE
 
 #include "routeCustomizableInfoBase.h"
 #include "routeSharedInfoBase.h"
 
-/// Provides specific information about an alternative for a given route
-struct IRouteAlternative : IRouteCustomizableInfo {
-	virtual unsigned id() const = 0;	///< unique id
+// namespace trip planner - specifications
+namespace tp { namespace specs {
 
-	/// The route shared information relevant for this alternative
-	virtual const IRouteSharedInfo& routeSharedInfo() const = 0;
+  /// Provides specific information about an alternative for a given route
+  struct IRouteAlternative : IRouteCustomizableInfo {
+	  virtual unsigned id() const = 0;	///< unique id
 
-	virtual bool returnTrip() const = 0;	///< represents a return trip
+	  /// The route shared information relevant for this alternative
+	  virtual const IRouteSharedInfo& routeSharedInfo() const = 0;
 
-	/// capacity of economy class seats
-	virtual unsigned economySeatsCapacity() const = 0;
+	  virtual bool returnTrip() const = 0;	///< represents a return trip
 
-	/// capacity of business class seats
-	virtual unsigned businessSeatsCapacity() const = 0;
+	  /// capacity of economy class seats
+	  virtual unsigned economySeatsCapacity() const = 0;
 
-	/**
-	The timetable for this alternative of the route.
-	These times are always traversed and kept in the forward direction,
-	even for return trips.
-	*/
-	virtual const std::vector<boost::posix_time::time_period>& timetable() const = 0;
-};
+	  /// capacity of business class seats
+	  virtual unsigned businessSeatsCapacity() const = 0;
+
+	  /**
+	  The timetable for this alternative of the route.
+	  These times are always traversed and kept in the forward direction,
+	  even for return trips.
+	  */
+	  virtual const std::vector<boost::posix_time::time_period>& timetable() const = 0;
+  };
+
+}} // namespace tp::specs
+
+#endif // H_ROUTE_ALTERNATIVE_BASE

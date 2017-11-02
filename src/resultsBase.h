@@ -22,16 +22,24 @@
  If not, see <http://www.gnu.org/licenses/agpl-3.0.txt>.
  *****************************************************************************/
 
-#pragma once
+#ifndef H_RESULTS_BASE
+#define H_RESULTS_BASE
 
 #include "variantsBase.h"
 
-/// Interface for the search results
-struct IResults abstract {
-	virtual ~IResults() = 0 {}
+// namespace trip planner - queries
+namespace tp { namespace queries {
 
-	/// @return the variants for the given category
-	virtual const IVariants& operator[](size_t categ) const = 0;
-};
+  /// Interface for the search results
+  struct IResults /*abstract*/ {
+	  virtual ~IResults() /*= 0*/ {}
 
-std::ostream& operator<<(std::ostream &os, const IResults &results);
+	  /// @return the variants for the given category
+	  virtual const IVariants& operator[](size_t categ) const = 0;
+  };
+
+}} // namespace tp::queries
+
+std::ostream& operator<<(std::ostream &os, const tp::queries::IResults &results);
+
+#endif // H_RESULTS_BASE

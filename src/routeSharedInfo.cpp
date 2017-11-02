@@ -26,146 +26,146 @@
 #include "customDateTimeProcessor.h"
 #include "util.h"
 
+#pragma warning ( push, 0 )
+
 #include <sstream>
 #include <algorithm>
+
+#pragma warning ( pop )
 
 using namespace std;
 using namespace boost::posix_time;
 using namespace boost::gregorian;
 
-RouteSharedInfo::RouteCustomizableInfo::RouteCustomizableInfo(
-			const string &odw_, const string &udya_) :
-		/*
-		The days of the week are specified as 0(Sun), 1(Mon), ..., 6(Sat),
-		but they appear in the bit string at the position (6-corresponding value).
-		This means that the read bit string must be reversed before interpreting it.
-		When not provided, the transportation is available every day of the week.
-		*/
-		odw(make_shared<bitset<7>>(string(CRBOUNDS(odw_)))),
-		udya(make_shared<set<date>>()) {
-	assert(nullptr != udya);
-	::updateUnavailDaysForTheYearAhead(udya_, *udya);
-}
+// namespace trip planner - specifications
+namespace tp { namespace specs {
+    RouteSharedInfo::RouteCustomizableInfo::RouteCustomizableInfo(
+			  const string &odw_, const string &udya_) :
+		  /*
+		  The days of the week are specified as 0(Sun), 1(Mon), ..., 6(Sat),
+		  but they appear in the bit string at the position (6-corresponding value).
+		  This means that the read bit string must be reversed before interpreting it.
+		  When not provided, the transportation is available every day of the week.
+		  */
+		  odw(make_shared<bitset<7>>(string(CRBOUNDS(odw_)))),
+		  udya(make_shared<set<date>>()) {
+	  assert(nullptr != udya);
+	  updateUnavailDaysForTheYearAhead(udya_, *udya);
+  }
 
-shared_ptr<bitset<7>>
-RouteSharedInfo::RouteCustomizableInfo::operationalDaysOfWeek() const {
-	assert(nullptr != odw);
-	return odw;
-}
+  shared_ptr<bitset<7>>
+  RouteSharedInfo::RouteCustomizableInfo::operationalDaysOfWeek() const {
+	  assert(nullptr != odw);
+	  return odw;
+  }
 
-shared_ptr<set<date>>
-RouteSharedInfo::RouteCustomizableInfo::unavailDaysForTheYearAhead() const {
-	assert(nullptr != udya);
-	return udya;
-}
+  shared_ptr<set<date>>
+          RouteSharedInfo::RouteCustomizableInfo::unavailDaysForTheYearAhead() const {
+	  assert(nullptr != udya);
+	  return udya;
+  }
 
-void RouteSharedInfo::validateStopIdx(size_t stopIdx) const {
-	if(stopIdx < _stopsCount)
-		return;
+  void RouteSharedInfo::validateStopIdx(size_t stopIdx) const {
+	  if(stopIdx < _stopsCount)
+		  return;
 
-	ostringstream oss;
-	oss<<__FUNCTION__ " uses an index ("<<stopIdx
-		<<") >= the limit ("<<_stopsCount<<")!";
-	throw out_of_range(oss.str());
-}
+	  ostringstream oss;
+	  oss<<__func__<<" uses an index ("<<stopIdx
+		  <<") >= the limit ("<<_stopsCount<<")!";
+	  throw out_of_range(oss.str());
+  }
 
-RouteSharedInfo::RouteSharedInfo(unsigned id_, size_t transpMode_, 
-								 unique_ptr<ITicketPriceCalculator> pricingEng_,
-								 const string &udya_/* = ""*/,
-								 const string &odw_/* = "1111111"*/) :
-	_id(id_), _transpMode(transpMode_),
-	routeCustomizableInfo(odw_, udya_),
-	pricingEng(move(pricingEng_)) {}
+  RouteSharedInfo::RouteSharedInfo(
+      unsigned id_, size_t transpMode_,
+      unique_ptr<ITicketPriceCalculator> pricingEng_,
+      const string &udya_/* = ""*/,
+      const string &odw_/* = "1111111"*/) :
+	  _id(id_), _transpMode(transpMode_),
+	  routeCustomizableInfo(odw_, udya_),
+	  pricingEng(move(pricingEng_)) {}
 
-unsigned RouteSharedInfo::id() const {
-	return _id;
-}
+  unsigned RouteSharedInfo::id() const {
+	  return _id;
+  }
 
-size_t RouteSharedInfo::transpMode() const {
-	return _transpMode;
-}
+  size_t RouteSharedInfo::transpMode() const {
+	  return _transpMode;
+  }
 
-size_t RouteSharedInfo::stopsCount() const {
-	return _stopsCount;
-}
+  size_t RouteSharedInfo::stopsCount() const {
+	  return _stopsCount;
+  }
 
-bool RouteSharedInfo::containsStop(unsigned placeId) const {
-	return stopsSet.find(placeId) != stopsSet.cend();
-}
+  bool RouteSharedInfo::containsStop(unsigned placeId) const {
+	  return stopsSet.find(placeId) != stopsSet.cend();
+  }
 
-unsigned RouteSharedInfo::nthStop(size_t stopIdx, bool returnTrip) const {
-	validateStopIdx(stopIdx);
+  unsigned RouteSharedInfo::nthStop(size_t stopIdx, bool returnTrip) const {
+	  validateStopIdx(stopIdx);
 	
-	if(returnTrip)
-		stopIdx = _stopsCount - 1ULL - stopIdx;
+	  if(returnTrip)
+		  stopIdx = _stopsCount - 1ULL - stopIdx;
 
-	return stops[stopIdx];
-}
+	  return stops[stopIdx];
+  }
 
-const vector<unsigned>& RouteSharedInfo::traversedStops() const {
-	return stops;
-}
+  const vector<unsigned>& RouteSharedInfo::traversedStops() const {
+	  return stops;
+  }
 
-const vector<float>& RouteSharedInfo::distances() const {
-	return _distances;
-}
+  const vector<float>& RouteSharedInfo::distances() const {
+	  return _distances;
+  }
 
-float RouteSharedInfo::nthDistance(size_t distIdx, bool returnTrip) const {
-	validateStopIdx(distIdx + 1ULL);
+  float RouteSharedInfo::nthDistance(size_t distIdx, bool returnTrip) const {
+	  validateStopIdx(distIdx + 1ULL);
 
-	if(returnTrip)
-		distIdx = _stopsCount - 2ULL - distIdx;
+	  if(returnTrip)
+		  distIdx = _stopsCount - 2ULL - distIdx;
 
-	return _distances[distIdx];
-}
+	  return _distances[distIdx];
+  }
 
-ITicketPriceCalculator& RouteSharedInfo::pricingEngine() const {
-	assert(nullptr != pricingEng);
-	return *pricingEng;
-}
+  ITicketPriceCalculator& RouteSharedInfo::pricingEngine() const {
+	  assert(nullptr != pricingEng);
+	  return *pricingEng;
+  }
 
-const set<unsigned>& RouteSharedInfo::alternatives() const {
-	return _alternatives;
-}
+  const set<unsigned>& RouteSharedInfo::alternatives() const {
+	  return _alternatives;
+  }
 
-const IRouteCustomizableInfo& RouteSharedInfo::customizableInfo() const {
-	return routeCustomizableInfo;
-}
+  const IRouteCustomizableInfo& RouteSharedInfo::customizableInfo() const {
+	  return routeCustomizableInfo;
+  }
 
-void RouteSharedInfo::setFirstPlace(unsigned placeId) {
-	if(!stops.empty()) {
-		ostringstream oss;
-		oss<<__FUNCTION__ " cannot be called twice!";
-		throw logic_error(oss.str());
-	}
+  void RouteSharedInfo::setFirstPlace(unsigned placeId) {
+	  if(!stops.empty())
+		  throw logic_error(string(__func__) + " cannot be called twice!");
 
-	_stopsCount = 1ULL;
-	stopsSet.insert(placeId);
-	stops.push_back(placeId);
-}
+	  _stopsCount = 1ULL;
+	  stopsSet.insert(placeId);
+	  stops.push_back(placeId);
+  }
 
-void RouteSharedInfo::setNextStop(unsigned placeId, float distToPrevStop) {
-	if(stops.empty()) {
-		ostringstream oss;
-		oss<<__FUNCTION__ " must be called after setFirstPlace()!";
-		throw logic_error(oss.str());
-	}
+  void RouteSharedInfo::setNextStop(unsigned placeId, float distToPrevStop) {
+	  if(stops.empty())
+		  throw logic_error(string(__func__) + " must be called after setFirstPlace()!");
 
-	if(false == stopsSet.insert(placeId).second) {
-		ostringstream oss;
-		oss<<__FUNCTION__ " detected a duplicate place id: "<<placeId;
-		throw domain_error(oss.str());
-	}
+	  if(false == stopsSet.insert(placeId).second)
+		  throw domain_error(string(__func__) + " detected a duplicate place id: " +
+                         to_string(placeId));
 
-	stops.push_back(placeId);
-	_distances.push_back(distToPrevStop);
-	++_stopsCount;
-}
+	  stops.push_back(placeId);
+	  _distances.push_back(distToPrevStop);
+	  ++_stopsCount;
+  }
 
-void RouteSharedInfo::addAlternative(unsigned alternativeId) {
-	if(false == _alternatives.insert(alternativeId).second) {
-		ostringstream oss;
-		oss<<__FUNCTION__ " detected a duplicate alternative id: "<<alternativeId;
-		throw domain_error(oss.str());
-	}
-}
+  void RouteSharedInfo::addAlternative(unsigned alternativeId) {
+	  if(false == _alternatives.insert(alternativeId).second)
+      throw domain_error(string(__func__) +
+                         " detected a duplicate alternative id: " +
+                         to_string(alternativeId));
+  }
+
+}} // namespace tp::specs

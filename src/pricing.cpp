@@ -24,41 +24,63 @@
 
 #include "pricing.h"
 
+#pragma warning ( push, 0 )
+
 #include <cmath>
 #include <algorithm>
 #include <stdexcept>
 
+#pragma warning ( pop )
+
 using namespace std;
 
-TicketPriceCalculator::TicketPriceCalculator(float kEconomy_, float kBusiness_/* = 0.f*/,
-											 float lowFareFactor_/* = 1.f*/, float highFareFactor_/* = 1.f*/) :
-		kEconomy(kEconomy_), kBusiness(kBusiness_),
-		lowFareFactor(lowFareFactor_), highFareFactor(highFareFactor_) {
-	if(kEconomy <= 0.f || kBusiness < 0.f || lowFareFactor <= 0.f || lowFareFactor > 1.f || highFareFactor < 1.f)
-		throw invalid_argument(__FUNCTION__ "doesn't accept negative parameters, nor a lowFareFactor outside [0,1] and neither a highFareFactor < 1!");
+// namespace trip planner - specifications
+namespace tp { namespace specs {
 
-	if(kBusiness != 0.f && kBusiness < kEconomy)
-		throw invalid_argument(__FUNCTION__ "expects kBusiness to be larger than kEconomy");
-}
+  TicketPriceCalculator::TicketPriceCalculator(float kEconomy_,
+                                               float kBusiness_/* = 0.f*/,
+                                               float lowFareFactor_/* = 1.f*/,
+                                               float highFareFactor_/* = 1.f*/) :
+		  kEconomy(kEconomy_), kBusiness(kBusiness_),
+		  lowFareFactor(lowFareFactor_), highFareFactor(highFareFactor_) {
+	  if(kEconomy <= 0.f || kBusiness < 0.f ||
+       lowFareFactor <= 0.f || lowFareFactor > 1.f || highFareFactor < 1.f)
+		  throw invalid_argument(string(__func__) +
+                             " doesn't accept negative parameters, "
+                             "nor a lowFareFactor outside [0,1] and neither a "
+                             "highFareFactor < 1!");
 
-/// @return ln(1 + k * tripDistance)
-float TicketPriceCalculator::normalFare(float tripDistance, bool economyClass/* = true*/) {
-	if(tripDistance <= 0.f)
-		throw invalid_argument(__FUNCTION__ " expects a strictly positive tripDistance parameter!");
+	  if(kBusiness != 0.f && kBusiness < kEconomy)
+		  throw invalid_argument(string(__func__) +
+                             " expects kBusiness to be larger than kEconomy");
+  }
 
-	const float k = economyClass ? kEconomy : kBusiness;
-	return log1pf(k * tripDistance);
-}
+  /// @return ln(1 + k * tripDistance)
+  float TicketPriceCalculator::normalFare(float tripDistance,
+                                          bool economyClass/* = true*/) {
+	  if(tripDistance <= 0.f)
+		  throw invalid_argument(string(__func__) + " expects a strictly positive "
+                             "tripDistance parameter!");
 
-/// @return ln(1 + k * tripDistance) * (lowFareFactor + (highFareFactor - lowFareFactor) * (e^max(urgency, occupancy) - 1) / (e - 1))
-float TicketPriceCalculator::airplaneFare(float tripDistance, float urgency, float occupancy,
-										  bool economyClass/* = true*/) {
-	const float basePrice = normalFare(tripDistance, economyClass);
+	  const float k = economyClass ? kEconomy : kBusiness;
+	  return log1pf(k * tripDistance);
+  }
 
-	if(urgency < 0.f || urgency > 1.f || occupancy < 0.f || occupancy > 1.f)
-		throw invalid_argument(__FUNCTION__ " expects urgency and occupancy parameters within [0,1] range!");
+  /// @return ln(1 + k * tripDistance) *
+  /// (lowFareFactor + (highFareFactor - lowFareFactor) *
+  /// (e^max(urgency, occupancy) - 1) / (e - 1))
+  float TicketPriceCalculator::airplaneFare(float tripDistance,
+                                            float urgency, float occupancy,
+                                            bool economyClass/* = true*/) {
+	  const float basePrice = normalFare(tripDistance, economyClass);
 
-	return basePrice * (lowFareFactor +
-						(highFareFactor - lowFareFactor) *
-						expm1f(max(urgency, occupancy)) / expm1f(1.f));
-}
+	  if(urgency < 0.f || urgency > 1.f || occupancy < 0.f || occupancy > 1.f)
+		  throw invalid_argument(string(__func__) + " expects urgency and occupancy "
+                             "parameters within [0,1] range!");
+
+	  return basePrice * (lowFareFactor +
+						  (highFareFactor - lowFareFactor) *
+						  expm1f(max(urgency, occupancy)) / expm1f(1.f));
+  }
+
+}} // namespace tp::specs

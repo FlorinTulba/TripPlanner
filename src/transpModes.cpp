@@ -24,60 +24,67 @@
 
 #include "transpModes.h"
 
+#pragma warning ( push, 0 )
+
 #include <map>
 #include <sstream>
 #include <stdexcept>
 
+#pragma warning ( pop )
+
 using namespace std;
 
-const char* TranspModes::toString(size_t masksCombination) {
-	static const char* combinations[] {
-		"None",	// 0
-		"Air",	// 1
-		"Rail",	// 2
-		"Air+Rail",	// 3
-		"Road",	// 4
-		"Air+Road", // 5
-		"Rail+Road", // 6
-		"Air+Rail+Road", // 7
-		"Water", // 8
-		"Air+Water", // 9
-		"Rail+Water", // 10
-		"Air+Rail+Water", // 11
-		"Road+Water", // 12
-		"Air+Road+Water", // 13
-		"Rail+Road+Water", // 14
-		"Air+Rail+Road+Water" // 15
-	};
+// namespace trip planner - specifications
+namespace tp { namespace specs {
 
-	static constexpr size_t namesCount = sizeof(combinations) / sizeof(char*);
-	if(masksCombination == 0ULL || masksCombination >= namesCount) {
-		ostringstream oss;
-		oss<<__FUNCTION__ " accepts values between [1,"
-			<<namesCount<<"]. Received instead: "<<masksCombination;
-		throw invalid_argument(oss.str());
-	}
+  const char* TranspModes::toString(size_t masksCombination) {
+	  static const char* combinations[] {
+		  "None",	// 0
+		  "Air",	// 1
+		  "Rail",	// 2
+		  "Air+Rail",	// 3
+		  "Road",	// 4
+		  "Air+Road", // 5
+		  "Rail+Road", // 6
+		  "Air+Rail+Road", // 7
+		  "Water", // 8
+		  "Air+Water", // 9
+		  "Rail+Water", // 10
+		  "Air+Rail+Water", // 11
+		  "Road+Water", // 12
+		  "Air+Road+Water", // 13
+		  "Rail+Road+Water", // 14
+		  "Air+Rail+Road+Water" // 15
+	  };
 
-	return combinations[masksCombination];
-}
+	  static constexpr size_t namesCount = sizeof(combinations) / sizeof(char*);
+	  if(masksCombination == 0ULL || masksCombination >= namesCount) {
+		  ostringstream oss;
+		  oss<<__func__<<" accepts values between [1,"
+			  <<namesCount<<"]. Received instead: "<<masksCombination;
+		  throw invalid_argument(oss.str());
+	  }
 
-size_t TranspModes::fromString(const char* description) {
-	static const map<string, size_t> maskForDescription = move(
-	[]() {
-		map<string, size_t> result;
-		for(size_t i = 1, lim = size_t(TranspModes::last<<1); i < lim; ++i)
-			result.emplace(string(toString(i)), i);
+	  return combinations[masksCombination];
+  }
+
+  size_t TranspModes::fromString(const char* description) {
+	  static const map<string, size_t> maskForDescription = []() {
+		  map<string, size_t> result;
+		  for(size_t i = 1, lim = size_t(TranspModes::last<<1); i < lim; ++i)
+			  result.emplace(string(toString(i)), i);
 		
-		return result;
-	}());
+		  return result;
+	  } ();
 
-	const auto it = maskForDescription.find(description);
-	if(maskForDescription.cend() == it) {
-		ostringstream oss;
-		oss<<__FUNCTION__ " was unable to recognize the transport mode combination: "
-			<<description;
-		throw invalid_argument(oss.str());
-	}
+    try {
+      return maskForDescription.at(description);
+    } catch(out_of_range&) {
+      ostringstream oss;
+      oss<<__func__<<" was unable to recognize the transport mode combination: "
+        <<description;
+      throw invalid_argument(oss.str());
+    }
+  }
 
-	return it->second;
-}
+}} // namespace tp::specs

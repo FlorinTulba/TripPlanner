@@ -38,35 +38,35 @@ namespace UnitTests {
 
 			// Invalid kEconomy
 			Assert::ExpectException<invalid_argument>(
-				[] {::TicketPriceCalculator tpc(-1.f); });
+				[] {tp::specs::TicketPriceCalculator tpc(-1.f); });
 			Assert::ExpectException<invalid_argument>(
-				[] {::TicketPriceCalculator tpc(0.f); });
+				[] {tp::specs::TicketPriceCalculator tpc(0.f); });
 
 			// Invalid kBusiness
 			Assert::ExpectException<invalid_argument>(
-				[] {::TicketPriceCalculator tpc(0.01f, -0.01f); });
+				[] {tp::specs::TicketPriceCalculator tpc(0.01f, -0.01f); });
 			Assert::ExpectException<invalid_argument>(
-				[] {::TicketPriceCalculator tpc(0.01f, 0.001f); });
+				[] {tp::specs::TicketPriceCalculator tpc(0.01f, 0.001f); });
 
 			// Invalid lowFareFactor
 			Assert::ExpectException<invalid_argument>(
-				[] {::TicketPriceCalculator tpc(3.4f, 6.5f, -0.01f); });
+				[] {tp::specs::TicketPriceCalculator tpc(3.4f, 6.5f, -0.01f); });
 			Assert::ExpectException<invalid_argument>(
-				[] {::TicketPriceCalculator tpc(3.4f, 6.5f, 0.f); });
+				[] {tp::specs::TicketPriceCalculator tpc(3.4f, 6.5f, 0.f); });
 			Assert::ExpectException<invalid_argument>(
-				[] {::TicketPriceCalculator tpc(3.4f, 6.5f, 1.001f); });
+				[] {tp::specs::TicketPriceCalculator tpc(3.4f, 6.5f, 1.001f); });
 
 			// Invalid lowFareFactor
 			Assert::ExpectException<invalid_argument>(
-				[] {::TicketPriceCalculator tpc(3.4f, 6.5f, 0.7f, 0.99f); });
+				[] {tp::specs::TicketPriceCalculator tpc(3.4f, 6.5f, 0.7f, 0.99f); });
 		}
 
 		TEST_METHOD(TicketPriceCalculator_CorectCtorParams_DoesntThrow) {
 			Logger::WriteMessage(__FUNCTION__);
 			try {
-				{::TicketPriceCalculator tpc(0.01f);}
-				{::TicketPriceCalculator tpc(3.4f, 3.4001f);}
-				{::TicketPriceCalculator tpc(3.4f, 6.5f, 1.f, 1.001f);}
+				{tp::specs::TicketPriceCalculator tpc(0.01f);}
+				{tp::specs::TicketPriceCalculator tpc(3.4f, 3.4001f);}
+				{tp::specs::TicketPriceCalculator tpc(3.4f, 6.5f, 1.f, 1.001f);}
 			} catch(invalid_argument &e) {
 				Logger::WriteMessage(e.what());
 				Assert::Fail();
@@ -76,7 +76,7 @@ namespace UnitTests {
 		TEST_METHOD(TicketPriceCalculator_invalidParamFareQueries_Throws) {
 			Logger::WriteMessage(__FUNCTION__);
 			try {
-				::TicketPriceCalculator tpc(1.f);
+        tp::specs::TicketPriceCalculator tpc(1.f);
 
 				// Invalid tripDistance
 				Assert::ExpectException<invalid_argument>(
@@ -108,7 +108,7 @@ namespace UnitTests {
 			constexpr float lowFareFactor = 0.75f,
 				highFareFactor = 2.f;
 			try {
-				::TicketPriceCalculator tpc(1.f, // kEconomy
+        tp::specs::TicketPriceCalculator tpc(1.f, // kEconomy
 											0.f, // no business class
 											lowFareFactor,
 											highFareFactor);

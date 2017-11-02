@@ -25,6 +25,8 @@
 #include "customDateTimeProcessor.h"
 #include "util.h"
 
+#pragma warning ( push, 0 )
+
 #include <sstream>
 #include <iomanip>
 #include <cassert>
@@ -32,94 +34,103 @@
 #include <boost/date_time/posix_time/posix_time_types.hpp>
 #include <boost/date_time/gregorian/parsers.hpp>
 
+#pragma warning ( pop )
+
 using namespace std;
 using namespace boost::posix_time;
 using namespace boost::gregorian;
 
-template vector<ptime>; // forced template instantiation
-vector<ptime> nowReplacements;
+// namespace trip planner - various
+namespace tp { inline namespace var {
 
-ptime nowUTC() {
-	while(!nowReplacements.empty()) {
-		ptime result = nowReplacements.back();
-		nowReplacements.pop_back();
-		return result; // leaves the rest for next calls to nowUTC()
-	}
+#if (defined(_MSC_VER) || defined(__clang__)) && !defined(__GNUC__)
+  template vector<ptime>; // forced template instantiation
+#endif // (_MSC_VER || __clang__) && !__GNUC__
+  vector<ptime> nowReplacements;
 
-	// If nowReplacements was/gets empty, return the actual current moment
-	return second_clock::universal_time();
-}
+  ptime nowUTC() {
+    while(!nowReplacements.empty()) {
+      ptime result = nowReplacements.back();
+      nowReplacements.pop_back();
+      return result; // leaves the rest for next calls to nowUTC()
+    }
 
-string formatTimePoint(const ptime &mom) {
-	const auto timePart = mom.time_of_day();
-	const auto datePart = mom.date();
-	const auto ymd = datePart.year_month_day();
-	ostringstream oss;
-	oss<<datePart.day_of_week().as_short_string()<<' '
-		<<ymd.month.as_short_string()<<'-'
-		<<ymd.day<<'-'
-		<<ymd.year<<' '
-		<<setw(2)<<setfill('0')<<timePart.hours()<<':'
-		<<setw(2)<<setfill('0')<<timePart.minutes();
-	return oss.str();
-}
+    // If nowReplacements was/gets empty, return the actual current moment
+    return second_clock::universal_time();
+  }
 
-string formatDuration(const time_duration& dur) {
-	const auto asHours = dur.hours();
-	const div_t days_hours = div(asHours, 24);
-	const auto mins = dur.minutes();
+  string formatTimePoint(const ptime &mom) {
+    const auto timePart = mom.time_of_day();
+    const auto datePart = mom.date();
+    const auto ymd = datePart.year_month_day();
+    ostringstream oss;
+    oss<<datePart.day_of_week().as_short_string()<<' '
+      <<ymd.month.as_short_string()<<'-'
+      <<ymd.day<<'-'
+      <<ymd.year<<' '
+      <<setw(2)<<setfill('0')<<timePart.hours()<<':'
+      <<setw(2)<<setfill('0')<<timePart.minutes();
+    return oss.str();
+  }
 
-	ostringstream oss;
-	bool daysPartPresent = false;
-	if(days_hours.quot > 0) {
-		daysPartPresent = true;
-		oss<<days_hours.quot<<" day";
-		if(days_hours.quot > 1)
-			oss<<'s';
-		oss<<", ";
-	}
-	if(days_hours.rem > 0 || daysPartPresent) {
-		oss<<days_hours.rem<<" hour";
-		if(days_hours.rem != 1)
-			oss<<'s';
-		oss<<" and ";
-	}
-	oss<<mins<<" minute";
-	if(mins != 1)
-		oss<<'s';
+  string formatDuration(const time_duration& dur) {
+    const auto asHours = dur.hours();
+    const div_t days_hours = div(asHours, 24);
+    const auto mins = dur.minutes();
 
-	return oss.str();
-}
+    ostringstream oss;
+    bool daysPartPresent = false;
+    if(days_hours.quot > 0) {
+      daysPartPresent = true;
+      oss<<days_hours.quot<<" day";
+      if(days_hours.quot > 1)
+        oss<<'s';
+      oss<<", ";
+    }
+    if(days_hours.rem > 0 || daysPartPresent) {
+      oss<<days_hours.rem<<" hour";
+      if(days_hours.rem != 1)
+        oss<<'s';
+      oss<<" and ";
+    }
+    oss<<mins<<" minute";
+    if(mins != 1)
+      oss<<'s';
 
-void updateUnavailDaysForTheYearAhead(const string &udyaStr,
-									  set<date>& udyaSet) {
-	// Dates delimited by '|' among 0 or more space-like symbols
-	const vector<string> providedDays = tokenize(udyaStr, R"(\s*\|\s*)");
+    return oss.str();
+  }
 
-	const date today = nowUTC().date();
-	const greg_year_month_day todayYMD = today.year_month_day();
-	const date startOfCurrentMonth =
-		today - days(todayYMD.day.as_number());
+  void updateUnavailDaysForTheYearAhead(const string &udyaStr,
+                                        set<date>& udyaSet) {
+    // Dates delimited by '|' among 0 or more space-like symbols
+    const vector<string> providedDays = tokenize(udyaStr, R"(\s*\|\s*)");
 
-	ostringstream oss;
-	oss<<todayYMD.year<<"-";
-	const string thisYearPrefix(oss.str());
-	oss.str("");
+    const date today = nowUTC().date();
+    const greg_year_month_day todayYMD = today.year_month_day();
+    const date startOfCurrentMonth =
+      today - days(todayYMD.day.as_number());
 
-	udyaSet.clear();
-	for(const string &mentionedDay : providedDays) {
-		oss<<thisYearPrefix<<mentionedDay;
-		date unavailDay(from_simple_string(oss.str()));
-		oss.str("");
-		bool relevantDate = true;
-		if(unavailDay < today) {
-			// all dates before the start of the month are projected 1 year ahead
-			if(unavailDay < startOfCurrentMonth)
-				unavailDay += years(1);
-			else // dates between today and the start of the month can be ignored (they remain in the past)
-				relevantDate = false;
-		}
-		if(relevantDate)
-			udyaSet.insert(unavailDay);
-	}
-}
+    ostringstream oss;
+    oss<<todayYMD.year<<"-";
+    const string thisYearPrefix(oss.str());
+    oss.str("");
+
+    udyaSet.clear();
+    for(const string &mentionedDay : providedDays) {
+      oss<<thisYearPrefix<<mentionedDay;
+      date unavailDay(from_simple_string(oss.str()));
+      oss.str("");
+      bool relevantDate = true;
+      if(unavailDay < today) {
+        // all dates before the start of the month are projected 1 year ahead
+        if(unavailDay < startOfCurrentMonth)
+          unavailDay += years(1);
+        else // dates between today and the start of the month can be ignored (they remain in the past)
+          relevantDate = false;
+      }
+      if(relevantDate)
+        udyaSet.insert(unavailDay);
+    }
+  }
+
+}} // namespace tp::var

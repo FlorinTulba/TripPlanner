@@ -22,34 +22,65 @@
  If not, see <http://www.gnu.org/licenses/agpl-3.0.txt>.
  *****************************************************************************/
 
-#pragma once
+#ifndef H_PLACE
+#define H_PLACE
 
 #include "placeBase.h"
 #include "warnings.h"
 
-/// Realization of IfUniquePlace
-class UniquePlace : public virtual IfUniquePlace {
-protected:
-	std::string _name;
+// namespace trip planner - specifications
+namespace tp { namespace specs {
 
-public:
-	UniquePlace(const std::string &name_);
+  /// Realization of IfPlace
+  class Place : public IfPlace {
+  protected:
+    GpsCoord<float> coord; ///< GPS location with single precision
 
-	/// Allows treating the interface IfUniquePlace like the actual realization class
-	UniquePlace(const IfUniquePlace &other);
+    /// All known names of the place, sorted by popularity (UTF-8 encoded)
+    std::vector<std::string> _names;
 
-	const std::string& name() const override;
-};
+    /// Short description of the place, encoded in UTF-8
+    std::string _shortDescr;
+    
+    unsigned _id;
 
-#pragma warning ( disable : INHERITANCE_VIA_DOMINANCE )
-/// Realization of IfPlace
-class Place : public UniquePlace, public IfPlace {
-protected:
-	unsigned _id;
+  public:
+    /**
+    Fills Place information.
+    Parameters names_ and shortDescr_ are UTF-8 encoded.
+    names_ uses `|` as separator between consecutive aliases of the place.
 
-public:
-	Place(unsigned id_, const std::string &name_);
+    @throw invalid_argument when names_ is empty or contains duplicates
+    */
+	  Place(unsigned id_, const GpsCoord<float> &location,
+          const std::string &names_, const std::string &shortDescr_ = u8"");
 
-	unsigned id() const override;
-};
-#pragma warning ( default : INHERITANCE_VIA_DOMINANCE )
+	  unsigned id() const override;
+
+    /// @return the GPS coordinate
+    const GpsCoord<float>& gpsCoord() const override;
+
+    /// @return all known names of the place, sorted by popularity (UTF-8 encoded)
+    const std::vector<std::string>& names() const override;
+
+    /**
+    Short description of the place, encoded in UTF-8.
+    For any place, the pair (names[i], shortDescr()) is unique, no matter i!
+
+    So, it helps locating the place known by names().
+    Possible convention for its values:
+    - could start with a country name abbreviation
+    - optionally followed by county / region within the given country
+    or a code for that region
+
+    Example:
+    names() = {u8"Venice", u8"Venezia"}
+    and shortDescr() = u8"Ita" - the one from Italy
+    or shortDescr() = u8"US, FL" - for the one from Florida, USA
+    */
+    const std::string& shortDescr() const override;
+  };
+
+}} // namespace tp::specs
+
+#endif // H_PLACE_BASE

@@ -35,6 +35,9 @@
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 using namespace std;
 using namespace boost::posix_time;
+using namespace tp::var;
+using namespace tp::queries;
+using namespace tp::specs;
 
 namespace UnitTests {
 	TEST_CLASS(Connection) {

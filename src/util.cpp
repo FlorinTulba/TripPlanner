@@ -24,20 +24,60 @@
 
 #include "util.h"
 
+#pragma warning ( push, 0 )
+
 #include <regex>
 #include <algorithm>
 #include <iterator>
 
+#pragma warning ( pop )
+
 using namespace std;
 
+const void* addrUnreferenced;
+
+#if (defined(_MSC_VER) || defined(__clang__)) && !defined(__GNUC__)
 template vector<string>; // forced template instantiation
+#endif // (_MSC_VER || __clang__) && !__GNUC__
 vector<string> tokenize(const string &s,
-						const string &regexDelimStr/* = R"(\s+)"*/) {
+                        const string &regexDelimStr/* = R"(\s+)"*/) {
 	vector<string> tokens;
 	if(s.empty()) // without this test, the resulted vector will contain one empty string
-		return move(tokens);
+		return tokens;
 
-	regex regexDelim(regexDelimStr);
+	const regex regexDelim(regexDelimStr);
 	copy(sregex_token_iterator(CBOUNDS(s), regexDelim, -1), {}, back_inserter(tokens));
-	return move(tokens);
+	return tokens;
+}
+
+static string trimHelper(const string &s, const regex &trimRE) {
+  smatch matchRE;
+  if(!regex_search(s, matchRE, trimRE) || matchRE.size() < 2ULL)
+    throw logic_error(string(__func__) + " couldn't extract the trim pattern!");
+  return matchRE[1ULL].str();
+}
+
+string trim(const string &s) {
+  static const regex trimRE(R"(^\s*((\S.*\S)?)\s*$)");
+  return trimHelper(s, trimRE);
+}
+
+string ltrim(const string &s) {
+  static const regex trimRE(R"(^\s*((\S[\s\S]*)?)$)");
+  return trimHelper(s, trimRE);
+}
+
+string rtrim(const string &s) {
+  static const regex trimRE(R"(^(([\s\S]*\S)?)\s*$)");
+  return trimHelper(s, trimRE);
+}
+
+#if (defined(_MSC_VER) || defined(__clang__)) && !defined(__GNUC__)
+template radians<float>;
+template radians<double>;
+template radians<long double>;
+#endif // (_MSC_VER || __clang__) && !__GNUC__
+
+constexpr radians<long double> operator"" _deg(long double degrees) {
+  return radians<long double>::fromDegrees(degrees);
 }

@@ -22,17 +22,29 @@
  If not, see <http://www.gnu.org/licenses/agpl-3.0.txt>.
  *****************************************************************************/
 
-#pragma once
+#ifndef H_CREDENTIALS_BASE
+#define H_CREDENTIALS_BASE
+
+#pragma warning ( push, 0 )
 
 #include <string>
 
-/**
-Interface for providing the user and password for a database.
-Allows selecting an implementation as secure as necessary.
-*/
-struct IfCredentials abstract {
-	virtual ~IfCredentials() = 0 {}
+#pragma warning ( pop )
 
-	virtual const std::string& user() const = 0;
-	virtual const std::string& password() const = 0;
-};
+ // namespace trip planner - specifications
+namespace tp { namespace specs {
+
+  /**
+  Interface for providing the user and password for a database.
+  Allows selecting an implementation as secure as necessary.
+  */
+  struct IfCredentials /*abstract*/ {
+	  virtual ~IfCredentials() /*= 0*/ {}
+
+	  virtual const std::string& user() const = 0;
+	  virtual const std::string& password() const = 0;
+  };
+
+}} // namespace tp::specs
+
+#endif // H_CREDENTIALS_BASE

@@ -22,7 +22,11 @@
  If not, see <http://www.gnu.org/licenses/agpl-3.0.txt>.
  *****************************************************************************/
 
-#pragma once
+#ifndef H_WARNINGS
+#define H_WARNINGS
 
 // The warnings intentionally suppressed by the project when there's no danger
 #define INHERITANCE_VIA_DOMINANCE 4250
+#define RESERVED_LITERAL_SUFFIX 4455
+
+#endif // H_WARNINGS

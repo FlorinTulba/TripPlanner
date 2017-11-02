@@ -35,6 +35,9 @@
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 using namespace std;
 using namespace boost::posix_time;
+using namespace tp::var;
+using namespace tp::specs;
+using namespace tp::queries;
 
 namespace UnitTests {
 	TEST_CLASS(Variant) {
@@ -50,7 +53,7 @@ namespace UnitTests {
 		TEST_METHOD(Variant_InvalidNewConnection_Throws) {
 			Logger::WriteMessage(__FUNCTION__);
 
-			::Variant v;
+      tp::queries::Variant v;
 
 			// appending null connection
 			Assert::ExpectException<invalid_argument>([&v] {
@@ -92,7 +95,7 @@ namespace UnitTests {
 		TEST_METHOD(Variant_SeveralNewConnections_Throws) {
 			Logger::WriteMessage(__FUNCTION__);
 
-			::Variant v;
+      tp::queries::Variant v;
 
 			try {
 				v.appendConnection(make_unique<Connection>(0ULL, 1ULL,

@@ -1,4 +1,4 @@
-/*****************************************************************************
+﻿/*****************************************************************************
  TripPlanner explores various issues common to navigation and booking systems.
 
  Copyrights from the libraries used by the program:
@@ -29,7 +29,7 @@ using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 using namespace std;
 
 namespace UnitTests {
-	TEST_CLASS(TokenizerTests) {
+	TEST_CLASS(TrimAndTokenizerTests) {
 		static inline bool compareStr(const string &s1,
 							   const string &s2) {
 			return s1.compare(s2) == 0;
@@ -68,5 +68,79 @@ namespace UnitTests {
 			inp = ""; produced = tokenize(inp); expect.clear();
 			Assert::IsTrue(compareStrVectors(expect, produced));
 		}
-	};
+
+    TEST_METHOD(TrimTests_VariousInput_ExpectedOutput) {
+      Logger::WriteMessage(__FUNCTION__);
+
+      struct ExpectedForInput {
+        string input;
+        string trimOut, ltrimOut, rtrimOut;
+      };
+
+      const vector<ExpectedForInput> cases {
+        {"", "", "", ""},
+
+        {"   ", "", "", ""},
+
+        {"   \n\t ", "", "", ""},
+
+        {"   \n\t a b c", "a b c",
+        "a b c", "   \n\t a b c"},
+
+        {"a b c   \n\t ", "a b c",
+        "a b c   \n\t ", "a b c"},
+
+        {"   \n\t a b c   \n\t ", "a b c",
+        "a b c   \n\t ", "   \n\t a b c"},
+        
+        {u8"   \n\t ∃y ∀x ¬(x ≺ y)   \n\t ", u8"∃y ∀x ¬(x ≺ y)",
+        u8"∃y ∀x ¬(x ≺ y)   \n\t ", u8"   \n\t ∃y ∀x ¬(x ≺ y)"},
+        
+        {u8"   \n\t 吴兆㈲㜸㐰   \n\t ", u8"吴兆㈲㜸㐰",
+        u8"吴兆㈲㜸㐰   \n\t ", u8"   \n\t 吴兆㈲㜸㐰"},
+        
+        {u8"   \n\t  Tîrşolţ  \n\t ", u8"Tîrşolţ",
+        u8"Tîrşolţ  \n\t ", u8"   \n\t  Tîrşolţ"},
+        
+        {u8"   \n\t  Temesvár  \n\t ", u8"Temesvár",
+        u8"Temesvár  \n\t ", u8"   \n\t  Temesvár"},
+        
+        {u8"   \n\t  🐨  \n\t ", u8"🐨",
+        u8"🐨  \n\t ", u8"   \n\t  🐨"},
+        
+        {u8"   \n\t  👨‍👨‍👧‍👧  \n\t ", u8"👨‍👨‍👧‍👧",
+        u8"👨‍👨‍👧‍👧  \n\t ", u8"   \n\t  👨‍👨‍👧‍👧"},
+        
+        {u8"   \n\t ю́   \n\t ", u8"ю́",
+        u8"ю́   \n\t ", u8"   \n\t ю́"},
+        
+        {u8"   \n\t  Ω  \n\t ", u8"Ω",
+        u8"Ω  \n\t ", u8"   \n\t  Ω"},
+        
+        {u8"   \n\t Приве́т नमस שָׁלוֹםे שָׁ   \n\t ", u8"Приве́т नमस שָׁלוֹםे שָׁ",
+        u8"Приве́т नमस שָׁלוֹםे שָׁ   \n\t ", u8"   \n\t Приве́т नमस שָׁלוֹםे שָׁ"}
+      };
+
+      for(const ExpectedForInput &c: cases) {
+        Assert::AreEqual(c.trimOut, trim(c.input));
+        Assert::AreEqual(c.ltrimOut, ltrim(c.input));
+        Assert::AreEqual(c.rtrimOut, rtrim(c.input));
+      }
+    }
+  };
+
+  TEST_CLASS(ConversionsTests) {
+  public:
+    TEST_METHOD(ConversionsTests_VariousInput_ExpectedOutput) {
+      Logger::WriteMessage(__FUNCTION__);
+
+      // miles <-> km
+      Assert::AreEqual(1.6093, milesToKm(1.), 1e-3);
+      Assert::AreEqual(0.6213, kmToMiles(1.), 1e-3);
+
+      // radians <-> degrees
+      Assert::AreEqual(180., radians<double>((double)Pi).get(true), 1e-3);
+      Assert::AreEqual((double)Pi, 180.0_deg, 1e-3);
+    }
+  };
 }

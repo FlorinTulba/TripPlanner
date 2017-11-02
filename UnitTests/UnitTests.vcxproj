@@ -58,6 +58,7 @@
       <AdditionalIncludeDirectories>$(SolutionDir)src;$(BoostDir);$(VCInstallDir)UnitTest\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>UNIT_TESTING;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <UseFullPaths>true</UseFullPaths>
+      <DisableSpecificWarnings>4068;4503</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -75,6 +76,7 @@
       <AdditionalIncludeDirectories>$(SolutionDir)src;$(BoostDir);$(VCInstallDir)UnitTest\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>UNIT_TESTING;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <UseFullPaths>true</UseFullPaths>
+      <DisableSpecificWarnings>4068;4503</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -108,6 +110,7 @@
     <ClCompile Include="testCustomDateTimeProcessor.cpp" />
     <ClCompile Include="testDbSource.cpp" />
     <ClCompile Include="testJsonSource.cpp" />
+    <ClCompile Include="testPlace.cpp" />
     <ClCompile Include="testPlanner.cpp" />
     <ClCompile Include="testPricing.cpp" />
     <ClCompile Include="testUtil.cpp" />

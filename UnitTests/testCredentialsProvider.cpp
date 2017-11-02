@@ -38,17 +38,17 @@ namespace UnitTests {
 
 			Assert::ExpectException<runtime_error>([] {
 				istringstream iss("\n\n");
-				::CredentialsProvider cp("", iss);
+        tp::specs::CredentialsProvider cp("", iss);
 			});
 
 			Assert::ExpectException<runtime_error>([] {
 				istringstream iss("testUser\n");
-				::CredentialsProvider cp("", iss);
+        tp::specs::CredentialsProvider cp("", iss);
 			});
 
 			Assert::ExpectException<runtime_error>([] {
 				istringstream iss("testUser");
-				::CredentialsProvider cp("", iss);
+        tp::specs::CredentialsProvider cp("", iss);
 			});
 		}
 
@@ -57,7 +57,7 @@ namespace UnitTests {
 
 			istringstream iss("testUser\ntestPassword\n");
 			try {
-				::CredentialsProvider cp("", iss);
+        tp::specs::CredentialsProvider cp("", iss);
 				Assert::AreEqual("testUser", cp.user().c_str());
 				Assert::AreEqual("testPassword", cp.password().c_str());
 			} catch(exception &e) {
@@ -72,7 +72,7 @@ namespace UnitTests {
 
 			istringstream iss("wrong\nwrong\n"); // prepare a stream with wrong values
 			try {
-				::CredentialsProvider cp("../../UnitTests/TestFiles/credentialsOk.bin", iss);
+        tp::specs::CredentialsProvider cp("../../UnitTests/TestFiles/credentialsOk.bin", iss);
 				Assert::AreEqual("testUser", cp.user().c_str());
 				Assert::AreEqual("testPassword", cp.password().c_str());
 			} catch(exception &e) {
@@ -87,7 +87,7 @@ namespace UnitTests {
 			// The '\n' from the start forces prompting multiple times for the username
 			istringstream iss("\n\n\ntestUser\ntestPassword\n");
 			try {
-				::CredentialsProvider cp("../../UnitTests/TestFiles/credentialsNotOk.bin", iss);
+        tp::specs::CredentialsProvider cp("../../UnitTests/TestFiles/credentialsNotOk.bin", iss);
 				Assert::AreEqual("testUser", cp.user().c_str());
 				Assert::AreEqual("testPassword", cp.password().c_str());
 			} catch(exception &e) {
@@ -111,7 +111,7 @@ namespace UnitTests {
 
 			istringstream iss("testUser\ntestPassword\n");
 			try {
-				::CredentialsProvider cp("../../UnitTests/TestFiles/credentialsNotOkClone.bin", iss);
+        tp::specs::CredentialsProvider cp("../../UnitTests/TestFiles/credentialsNotOkClone.bin", iss);
 				Assert::AreEqual("testUser", cp.user().c_str());
 				Assert::AreEqual("testPassword", cp.password().c_str());
 			} catch(exception &e) {

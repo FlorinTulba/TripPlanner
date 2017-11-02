@@ -22,45 +22,61 @@
  If not, see <http://www.gnu.org/licenses/agpl-3.0.txt>.
  *****************************************************************************/
 
-#pragma once
+#ifndef H_CREDENTIALS_PROVIDER
+#define H_CREDENTIALS_PROVIDER
 
 #include "credentialsBase.h"
 #include "util.h"
 
+#pragma warning ( push, 0 )
+
 #include <iostream>
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wignored-attributes"
+#pragma clang diagnostic ignored "-Wexpansion-to-defined"
 #include <boost/archive/binary_iarchive.hpp>
+#pragma clang diagnostic pop
 #include <boost/archive/binary_oarchive.hpp>
 
-/**
-Realization of IfCredentials.
-It checks for a certain file containing the credentials.
+#pragma warning ( pop )
 
-If the file doesn`t exist, it prompts the user for those credentials.
-In this case, it attempts to write the provided values to a file.
-When the file cannot be created, it just issues a warning about that.
+// namespace trip planner - specifications
+namespace tp { namespace specs {
 
-Although the output is a binary file, the credentials appear in clear,
-so it`s not a secure solution.
-*/
-class CredentialsProvider : public IfCredentials {
-protected:
-	std::string _user;
-	std::string _password;
+  /**
+  Realization of IfCredentials.
+  It checks for a certain file containing the credentials.
 
-public:
-	/**
-	Using promptStream is helpful for Unit testing
-	*/
-	CredentialsProvider(const std::string &credentialsFile,
-						std::istream &promptStream = std::cin);
+  If the file doesn`t exist, it prompts the user for those credentials.
+  In this case, it attempts to write the provided values to a file.
+  When the file cannot be created, it just issues a warning about that.
 
-	const std::string& user() const override;
-	const std::string& password() const override;
+  Although the output is a binary file, the credentials appear in clear,
+  so it`s not a secure solution.
+  */
+  class CredentialsProvider : public IfCredentials {
+  protected:
+	  std::string _user;
+	  std::string _password;
 
-	template<class Archive>
-	void serialize(Archive &ar, const unsigned version) {
-		UNREFERENCED(version);
-		ar & _user & _password;
-	}
-};
+  public:
+	  /**
+	  Using promptStream is helpful for Unit testing
+	  */
+	  CredentialsProvider(const std::string &credentialsFile,
+                        std::istream &promptStream = std::cin);
+
+	  const std::string& user() const override;
+	  const std::string& password() const override;
+
+	  template<class Archive>
+	  void serialize(Archive &ar, const unsigned version) {
+		  UNREFERENCED(version);
+		  ar & _user & _password;
+	  }
+  };
+
+}} // namespace tp::specs
+
+#endif // H_CREDENTIALS_PROVIDER

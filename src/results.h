@@ -22,26 +22,34 @@
  If not, see <http://www.gnu.org/licenses/agpl-3.0.txt>.
  *****************************************************************************/
 
-#pragma once
+#ifndef H_RESULTS
+#define H_RESULTS
 
 #include "resultsBase.h"
 
 #include <vector>
 
-/// Realization of IResults
-class Results : public IResults {
-protected:
-	std::vector<std::unique_ptr<IVariants>> results;
+// namespace trip planner - queries
+namespace tp { namespace queries {
 
-	IVariants& get(size_t categ) const;
+  /// Realization of IResults
+  class Results : public IResults {
+  protected:
+	  std::vector<std::unique_ptr<IVariants>> results;
 
-public:
-	/// Initializes empty results
-	Results();
+	  IVariants& get(size_t categ) const;
 
-	/// @return editable variants for the given category
-	IVariants& operator[](size_t categ);
+  public:
+	  /// Initializes empty results
+	  Results();
 
-	/// @return the variants for the given category
-	const IVariants& operator[](size_t categ) const override;
-};
+	  /// @return editable variants for the given category
+	  IVariants& operator[](size_t categ);
+
+	  /// @return the variants for the given category
+	  const IVariants& operator[](size_t categ) const override;
+  };
+
+}} // namespace tp::queries
+
+#endif // H_RESULTS

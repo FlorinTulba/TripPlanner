@@ -22,39 +22,51 @@
  If not, see <http://www.gnu.org/licenses/agpl-3.0.txt>.
  *****************************************************************************/
 
-#pragma once
+#ifndef H_CONSTRAINTS
+#define H_CONSTRAINTS
 
 #include "constraintsBase.h"
 #include "customDateTimeProcessor.h"
 
+#pragma warning ( push, 0 )
+
 #include <boost/date_time/posix_time/posix_time_types.hpp>
 
-/// Realization of ITimeConstraints
-class TimeConstraints : public ITimeConstraints {
-protected:
-	/// Imposed period for departure
-	boost::posix_time::time_period _leavePeriod;
+#pragma warning ( pop )
 
-	/// Imposed period for arrival
-	boost::posix_time::time_period _arrivePeriod;
+ // namespace trip planner - queries
+namespace tp { namespace queries {
 
-public:
-	/**
-	Imposed intervals for leaving and arrival.
-	The default intervals are each from now until a year from now.
-	*/
-	TimeConstraints(const boost::posix_time::time_period &leavePeriod_ =
-						boost::posix_time::time_period(
-							nowUTC(),
-							boost::posix_time::hours(366 * 24)),
-					const boost::posix_time::time_period &arrivePeriod_ =
-						boost::posix_time::time_period(
-							nowUTC(),
-							boost::posix_time::hours(366 * 24)));
+  /// Realization of ITimeConstraints
+  class TimeConstraints : public ITimeConstraints {
+  protected:
+	  /// Imposed period for departure
+	  boost::posix_time::time_period _leavePeriod;
 
-	/// Imposed period for departure
-	const boost::posix_time::time_period& leavePeriod() const override;
+	  /// Imposed period for arrival
+	  boost::posix_time::time_period _arrivePeriod;
 
-	/// Imposed period for arrival
-	const boost::posix_time::time_period& arrivePeriod() const override;
-};
+  public:
+	  /**
+	  Imposed intervals for leaving and arrival.
+	  The default intervals are each from now until a year from now.
+	  */
+	  TimeConstraints(const boost::posix_time::time_period &leavePeriod_ =
+                      boost::posix_time::time_period(
+                        tp::nowUTC(),
+                        boost::posix_time::hours(366 * 24)),
+                    const boost::posix_time::time_period &arrivePeriod_ =
+                      boost::posix_time::time_period(
+                        tp::nowUTC(),
+                        boost::posix_time::hours(366 * 24)));
+
+	  /// Imposed period for departure
+	  const boost::posix_time::time_period& leavePeriod() const override;
+
+	  /// Imposed period for arrival
+	  const boost::posix_time::time_period& arrivePeriod() const override;
+  };
+
+}} // namespace tp::queries
+
+#endif // H_CONSTRAINTS

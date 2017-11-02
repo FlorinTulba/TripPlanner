@@ -22,17 +22,32 @@
  If not, see <http://www.gnu.org/licenses/agpl-3.0.txt>.
  *****************************************************************************/
 
-#pragma once
+#ifndef H_CONSTRAINTS_BASE
+#define H_CONSTRAINTS_BASE
+
+#pragma warning ( push, 0 )
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wignored-attributes"
 
 #include <boost/date_time/posix_time/time_period.hpp>
 
-/// Provides the leave and arrive imposed intervals or maximum range if unconstrained
-struct ITimeConstraints abstract {
-	virtual ~ITimeConstraints() = 0 {}
+#pragma clang diagnostic pop
+#pragma warning ( pop )
 
-	/// Imposed period for departure
-	virtual const boost::posix_time::time_period& leavePeriod() const = 0;
+// namespace trip planner - queries
+namespace tp { namespace queries {
 
-	/// Imposed period for arrival
-	virtual const boost::posix_time::time_period& arrivePeriod() const = 0;
-};
+  /// Provides the leave and arrive imposed intervals or maximum range if unconstrained
+  struct ITimeConstraints /*abstract*/ {
+	  virtual ~ITimeConstraints() /*= 0*/ {}
+
+	  /// Imposed period for departure
+	  virtual const boost::posix_time::time_period& leavePeriod() const = 0;
+
+	  /// Imposed period for arrival
+	  virtual const boost::posix_time::time_period& arrivePeriod() const = 0;
+  };
+
+}} // namespace tp::queries
+
+#endif // H_CONSTRAINTS_BASE

@@ -22,45 +22,53 @@
  If not, see <http://www.gnu.org/licenses/agpl-3.0.txt>.
  *****************************************************************************/
 
-#pragma once
+#ifndef H_VARIANT
+#define H_VARIANT
 
 #include "variantsBase.h"
 
-/// Realization of IVariant
-class Variant : public IVariant {
-protected:
-	std::vector<std::unique_ptr<IConnection>> conns;	///< the computed connections
+// namespace trip planner - queries
+namespace tp { namespace queries {
 
-public:
-	/// Extends the connections chain
-	void appendConnection(std::unique_ptr<IConnection> conn);
+  /// Realization of IVariant
+  class Variant : public IVariant {
+  protected:
+	  std::vector<std::unique_ptr<IConnection>> conns;	///< the computed connections
 
-	/// @return the connections
-	const std::vector<std::unique_ptr<IConnection>>& connections() const override;
+  public:
+	  /// Extends the connections chain
+	  void appendConnection(std::unique_ptr<IConnection> conn);
 
-	/// The start of the interval
-	boost::posix_time::ptime begin() const override;
+	  /// @return the connections
+	  const std::vector<std::unique_ptr<IConnection>>& connections() const override;
 
-	/// The end of the interval
-	boost::posix_time::ptime end() const override;
+	  /// The start of the interval
+	  boost::posix_time::ptime begin() const override;
 
-	/// Trip duration for the connected locations.
-	/// Use formatDuration from util.h to display this value
-	boost::posix_time::time_duration duration() const override;
+	  /// The end of the interval
+	  boost::posix_time::ptime end() const override;
 
-	/// @return the index of the starting point (local / global)
-	size_t from() const override;
+	  /// Trip duration for the connected locations.
+	  /// Use formatDuration from util.h to display this value
+	  boost::posix_time::time_duration duration() const override;
 
-	/// @return the index of the destination point (local / global)
-	size_t to() const override;
+	  /// @return the index of the starting point (local / global)
+	  size_t from() const override;
 
-	/// Price of the ticket(s) between the connected locations
-	float price() const override;
+	  /// @return the index of the destination point (local / global)
+	  size_t to() const override;
 
-	/// Distance between the connected locations in the given configuration
-	float distance() const override;
+	  /// Price of the ticket(s) between the connected locations
+	  float price() const override;
 
-	/// Utilized transportation modes. Use TranspModes::toString to display it.
-	/// @return overlapping bitmasks for every specific mode
-	size_t transpModes() const override;
-};
+	  /// Distance between the connected locations in the given configuration
+	  float distance() const override;
+
+	  /// Utilized transportation modes. Use TranspModes::toString to display it.
+	  /// @return overlapping bitmasks for every specific mode
+	  size_t transpModes() const override;
+  };
+
+}} // namespace tp::queries
+
+#endif // H_VARIANT

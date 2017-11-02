@@ -33,6 +33,7 @@ using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 using namespace std;
 using namespace boost::posix_time;
 using namespace boost::gregorian;
+using namespace tp::var;
 
 namespace UnitTests {
 	TEST_CLASS(DurationAndTimeFormatter) {
@@ -66,10 +67,10 @@ namespace UnitTests {
 			Logger::WriteMessage(__FUNCTION__);
 
 			Assert::IsTrue(0 == formatTimePoint(
-				ptime(from_simple_string("2017-Oct-17"), duration_from_string("7:4"))).
+				ptime(from_simple_string("2017-Oct-17"s), duration_from_string("7:4"s))).
 				compare("Tue Oct-17-2017 07:04"));
 			Assert::IsTrue(0 == formatTimePoint(
-				ptime(from_simple_string("2017-Jan-25"), duration_from_string("22:50"))).
+				ptime(from_simple_string("2017-Jan-25"s), duration_from_string("22:50"s))).
 				compare("Wed Jan-25-2017 22:50"));
 		}
 	};

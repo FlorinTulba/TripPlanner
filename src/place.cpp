@@ -24,20 +24,53 @@
 
 #include "place.h"
 
+#pragma warning ( push, 0 )
+
+#include <set>
+#include <stdexcept>
+
+#pragma warning ( pop )
+
 using namespace std;
 
-UniquePlace::UniquePlace(const string &name_) : _name(name_) {}
+// namespace trip planner - specifications
+namespace tp { namespace specs {
 
-UniquePlace::UniquePlace(const IfUniquePlace &other) :
-	UniquePlace(other.name()) {}
+  Place::Place(unsigned id_, const GpsCoord<float> &location,
+               const string &names_, const string &shortDescr_/* = u8""*/) :
+      _id(id_), coord(location),
+      _names(tokenize(trim(names_), R"(\s*\|\s*)")),
+      _shortDescr(trim(shortDescr_)) {
+    if(_names.empty())
+      throw invalid_argument(string(__func__) +
+                             " needs at least one name for each place.");
 
-const string& UniquePlace::name() const {
-	return _name;
-}
+    set<string> uniqueNames(CBOUNDS(_names));
+    if(uniqueNames.size() != _names.size())
+      throw invalid_argument(string(__func__) +
+                             " needs non-duplicate names of the place. "
+                             "Received instead: "s + names_);
 
-Place::Place(unsigned id_, const string &name_) :
-	UniquePlace(name_), _id(id_) {}
+    if(uniqueNames.find("") != cend(uniqueNames))
+      throw invalid_argument(string(__func__) +
+                             " needs non-empty names for the place. "
+                             "Received instead: "s + names_);
+  }
 
-unsigned Place::id() const {
-	return _id;
-}
+  unsigned Place::id() const {
+	  return _id;
+  }
+
+  const GpsCoord<float>& Place::gpsCoord() const {
+    return coord;
+  }
+
+  const vector<string>& Place::names() const {
+    return _names;
+  }
+
+  const string& Place::shortDescr() const {
+    return _shortDescr;
+  }
+
+}} // namespace tp::specs

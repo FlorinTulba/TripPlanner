@@ -30,6 +30,8 @@
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 using namespace std;
 using namespace boost::posix_time;
+using namespace tp::var;
+using namespace tp::queries;
 
 namespace UnitTests {
 	TEST_CLASS(TimeConstraints) {

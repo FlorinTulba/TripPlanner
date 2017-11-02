@@ -22,19 +22,27 @@
  If not, see <http://www.gnu.org/licenses/agpl-3.0.txt>.
  *****************************************************************************/
 
-#pragma once
+#ifndef H_VARIANTS
+#define H_VARIANTS
 
 #include "variantsBase.h"
 
-/// Realization of IVariants
-class Variants : public IVariants {
-protected:
-	std::vector<std::unique_ptr<IVariant>> variants;	///< the computed variants
+// namespace trip planner - queries
+namespace tp { namespace queries {
 
-public:
-	/// Appends a less performant variant than the previous one
-	void add(std::unique_ptr<IVariant> variant);
+  /// Realization of IVariants
+  class Variants : public IVariants {
+  protected:
+	  std::vector<std::unique_ptr<IVariant>> variants;	///< the computed variants
 
-	/// @return the stored variants
-	const std::vector<std::unique_ptr<IVariant>>& get() const override;
-};
+  public:
+	  /// Appends a less performant variant than the previous one
+	  void add(std::unique_ptr<IVariant> variant);
+
+	  /// @return the stored variants
+	  const std::vector<std::unique_ptr<IVariant>>& get() const override;
+  };
+
+}} // namespace tp::queries
+
+#endif // H_VARIANTS
